@@ -1,0 +1,17 @@
+rootProject.name = 'fstored-api'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        boot {
+
+        }
+
+        workspace {
+
+        }
+
+        testWorkspace {
+
+        }
+    }
+}
