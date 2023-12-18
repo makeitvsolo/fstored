@@ -1,0 +1,4 @@
+dependencies {
+    implementation project(':internal:core')
+    implementation project(':internal:storage:domain')
+}

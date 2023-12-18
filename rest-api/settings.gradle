@@ -4,6 +4,7 @@ include 'internal:core'
 
 include 'internal:storage'
 include 'internal:storage:domain'
+include 'internal:storage:application'
 
 dependencyResolutionManagement {
     versionCatalogs {
