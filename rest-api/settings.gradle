@@ -1,5 +1,7 @@
 rootProject.name = 'fstored-api'
 
+include 'internal:core'
+
 dependencyResolutionManagement {
     versionCatalogs {
         boot {
