@@ -1,4 +1,8 @@
 dependencies {
     implementation project(':internal:core')
     implementation project(':internal:storage:domain')
+
+    testImplementation testWorkspace.junit.api
+    testImplementation testWorkspace.mockito.core
+    testRuntimeOnly testWorkspace.junit.engine
 }

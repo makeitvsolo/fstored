@@ -17,7 +17,14 @@ dependencyResolutionManagement {
         }
 
         testWorkspace {
+            def junit5 = version('junit5', '5.10.1')
+            def mockito = version('mockito', '5.7.0')
 
+            library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef(junit5)
+            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef(junit5)
+            library('junit-params', 'org.junit.jupiter', 'junit-jupiter-params').versionRef(junit5)
+
+            library('mockito-core', 'org.mockito', 'mockito-core').versionRef(mockito)
         }
     }
 }
