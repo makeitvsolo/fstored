@@ -5,8 +5,11 @@ import github.makeitvsolo.fstored.storage.application.storage.handle.ComposeFile
 import github.makeitvsolo.fstored.storage.application.storage.handle.FileHandle;
 import github.makeitvsolo.fstored.storage.application.storage.source.BinarySource;
 import github.makeitvsolo.fstored.storage.application.usecase.file.dto.WriteFileDto;
+import github.makeitvsolo.fstored.storage.application.usecase.file.dto.WriteMultipleFileDto;
 import github.makeitvsolo.fstored.storage.application.usecase.file.exception.FileAlreadyExistsException;
 import github.makeitvsolo.fstored.storage.application.usecase.file.exception.WrongFileHandleException;
+
+import java.util.HashMap;
 
 public final class WriteFileUsecase<H extends FileHandle> {
 
@@ -29,5 +32,25 @@ public final class WriteFileUsecase<H extends FileHandle> {
         }
 
         storage.write(handle, source);
+    }
+
+    public void invoke(final WriteMultipleFileDto payload) {
+        var sources = new HashMap<H, BinarySource>(payload.files().size());
+
+        payload.files()
+                .forEach(file -> {
+                    var handle = fileHandle.composeAsFileRelative(payload.root(), payload.path(), file.relativeName())
+                            .unwrapOrElseThrow(WrongFileHandleException::new);
+
+                    if (!payload.overwrite() && storage.exists(handle)) {
+                        throw new FileAlreadyExistsException();
+                    }
+
+                    var source = new BinarySource(file.stream(), file.size());
+
+                    sources.put(handle, source);
+                });
+
+        storage.writeMultiple(sources);
     }
 }
