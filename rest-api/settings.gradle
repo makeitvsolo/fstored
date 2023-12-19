@@ -6,6 +6,7 @@ include 'internal:storage'
 include 'internal:storage:domain'
 include 'internal:storage:application'
 include 'internal:storage:storage-minio'
+include 'internal:storage:tests'
 
 dependencyResolutionManagement {
     versionCatalogs {

@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':internal:core')
+    implementation project(':internal:storage:domain')
+    implementation project(':internal:storage:application')
+    implementation project(':internal:storage:storage-minio')
+}
