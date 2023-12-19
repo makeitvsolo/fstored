@@ -69,7 +69,7 @@ public final class ComposeMinioHandle
             return Result.err(new WrongMinioHandleError("invalid file relative name"));
         }
 
-        var objectName = String.join(root, parent, relativePath);
+        var objectName = root.concat(parent).concat(relativePath);
         return Result.ok(new MinioHandle(objectName));
     }
 }
