@@ -2,6 +2,12 @@ rootProject.name = 'fstored-api'
 
 include 'internal:core'
 
+include 'internal:storage'
+include 'internal:storage:domain'
+include 'internal:storage:application'
+include 'internal:storage:storage-minio'
+include 'internal:storage:tests'
+
 dependencyResolutionManagement {
     versionCatalogs {
         boot {
@@ -9,11 +15,24 @@ dependencyResolutionManagement {
         }
 
         workspace {
+            def minio = version('minio', '8.5.7')
 
+            library('minio', 'io.minio', 'minio').versionRef(minio)
         }
 
         testWorkspace {
+            def junit5 = version('junit5', '5.10.1')
+            def mockito = version('mockito', '5.7.0')
+            def testcontainers = version('testcontainers', '1.19.2')
 
+            library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef(junit5)
+            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef(junit5)
+            library('junit-params', 'org.junit.jupiter', 'junit-jupiter-params').versionRef(junit5)
+
+            library('mockito-core', 'org.mockito', 'mockito-core').versionRef(mockito)
+
+            library('testcontainers', 'org.testcontainers', 'testcontainers').versionRef(testcontainers)
+            library('testcontainers-junit', 'org.testcontainers', 'junit-jupiter').versionRef(testcontainers)
         }
     }
 }
