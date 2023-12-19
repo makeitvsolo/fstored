@@ -2,6 +2,10 @@ package github.makeitvsolo.fstored.storage.minio.internal;
 
 import github.makeitvsolo.fstored.storage.application.storage.source.BinarySource;
 import github.makeitvsolo.fstored.storage.domain.File;
+import github.makeitvsolo.fstored.storage.domain.Folder;
+import github.makeitvsolo.fstored.storage.domain.meta.FileMetaData;
+import github.makeitvsolo.fstored.storage.domain.meta.FolderMetaData;
+import github.makeitvsolo.fstored.storage.domain.meta.MetaData;
 import github.makeitvsolo.fstored.storage.minio.exception.MinioInternalException;
 import github.makeitvsolo.fstored.storage.minio.handle.MinioHandle;
 import io.minio.BucketExistsArgs;
@@ -9,17 +13,21 @@ import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
 import io.minio.Directive;
 import io.minio.GetObjectArgs;
+import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.RemoveObjectsArgs;
 import io.minio.SnowballObject;
 import io.minio.StatObjectArgs;
 import io.minio.UploadSnowballObjectsArgs;
 import io.minio.errors.ErrorResponseException;
+import io.minio.messages.DeleteObject;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -128,6 +136,26 @@ public final class MinioObjectStorage {
         }
     }
 
+    public void removeMultiple(final List<MinioHandle> objects) {
+        try {
+            var deleteObjects = objects.stream()
+                    .map(handle -> new DeleteObject(handle.objectName()))
+                    .toList();
+
+            var results = client.removeObjects(RemoveObjectsArgs.builder()
+                    .bucket(rootBucket)
+                    .objects(deleteObjects)
+                    .build()
+            );
+
+            for (var result : results) {
+                var unusedError = result.get();
+            }
+        } catch (Exception ex) {
+            throw new MinioInternalException(ex);
+        }
+    }
+
     public void copy(final MinioHandle source, final MinioHandle destination) {
         try {
             client.copyObject(CopyObjectArgs.builder()
@@ -168,6 +196,121 @@ public final class MinioObjectStorage {
             ));
         } catch (ErrorResponseException ex) {
             return Optional.empty();
+        } catch (Exception ex) {
+            throw new MinioInternalException(ex);
+        }
+    }
+
+    public List<MinioHandle> findObjects(final String prefix, final boolean recursive) {
+        try {
+            var results = client.listObjects(ListObjectsArgs.builder()
+                    .bucket(rootBucket)
+                    .prefix(prefix)
+                    .recursive(recursive)
+                    .build()
+            );
+
+            var objects = new ArrayList<MinioHandle>();
+            for (var result : results) {
+                var item = result.get();
+                objects.add(
+                        new MinioHandle(item.objectName())
+                );
+            }
+
+            return objects;
+        } catch (Exception ex) {
+            throw new MinioInternalException(ex);
+        }
+    }
+
+    public List<MetaData> findMatches(final MinioHandle parent, final String name) {
+        try {
+            var recursive = true;
+            var results = client.listObjects(ListObjectsArgs.builder()
+                    .bucket(rootBucket)
+                    .prefix(parent.objectName())
+                    .recursive(recursive)
+                    .build()
+            );
+
+            var nameLowerCase = name.toLowerCase();
+            var metas = new ArrayList<MetaData>();
+            for (var result : results) {
+                var item = result.get();
+
+                if (item.objectName().equals(parent.objectName())) {
+                    continue;
+                }
+
+                var handle = new MinioHandle(item.objectName());
+
+                var infixLowerCase = handle.infix().toLowerCase();
+                if (!infixLowerCase.contains(nameLowerCase)) {
+                    continue;
+                }
+
+                if (handle.isFolder()) {
+                    metas.add(new FolderMetaData(
+                            handle.root(), handle.path()
+                    ));
+                } else {
+                    metas.add(new FileMetaData(
+                            handle.root(),
+                            handle.path(),
+                            item.size(),
+                            item.lastModified().toLocalDateTime()
+                    ));
+                }
+            }
+
+            return metas;
+        } catch (Exception ex) {
+            throw new MinioInternalException(ex);
+        }
+    }
+
+    public Optional<Folder> findFolder(final MinioHandle handle) {
+        try {
+            var recursive = false;
+            var results = client.listObjects(ListObjectsArgs.builder()
+                    .bucket(rootBucket)
+                    .prefix(handle.objectName())
+                    .recursive(recursive)
+                    .build()
+            );
+
+            var metas = new ArrayList<MetaData>();
+            for (var result : results) {
+                var item = result.get();
+
+                if (item.objectName().equals(handle.objectName())) {
+                    continue;
+                }
+
+                var childHandle = new MinioHandle(item.objectName());
+
+                if (childHandle.isFolder()) {
+                    metas.add(new FolderMetaData(
+                            childHandle.root(), childHandle.path()
+                    ));
+                } else {
+                    metas.add(new FileMetaData(
+                            childHandle.root(),
+                            childHandle.path(),
+                            item.size(),
+                            item.lastModified().toLocalDateTime()
+                    ));
+                }
+            }
+
+            if (metas.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return Optional.of(new Folder(
+                    handle.root(), handle.path(), metas
+            ));
         } catch (Exception ex) {
             throw new MinioInternalException(ex);
         }

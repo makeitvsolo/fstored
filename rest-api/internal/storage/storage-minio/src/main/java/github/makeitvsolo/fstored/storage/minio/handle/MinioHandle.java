@@ -57,8 +57,28 @@ public final class MinioHandle implements FolderHandle, FileHandle {
                 .collect(Collectors.joining(PATH_DELIMITER, ROOT_PATH, ""));
     }
 
+    public String infix() {
+        return Arrays.stream(objectName.split(PATH_DELIMITER))
+                .reduce((first, second) -> second)
+                .get();
+    }
+
     public boolean isFolder() {
         return objectName.endsWith(PATH_DELIMITER);
+    }
+
+    public Result<MinioHandle> softMove(final MinioHandle source, final MinioHandle destination) {
+        if (!source.isFolder()) {
+            return Result.err(new WrongMinioHandleError("source is not a folder"));
+        }
+
+        if (!destination.isFolder()) {
+            return Result.err(new WrongMinioHandleError("destination is not a folder"));
+        }
+
+        return Result.ok(new MinioHandle(
+                objectName.replaceFirst(source.objectName, destination.objectName)
+        ));
     }
 
     @Override
