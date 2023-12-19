@@ -8,6 +8,7 @@ import github.makeitvsolo.fstored.storage.application.usecase.folder.dto.Matchin
 import github.makeitvsolo.fstored.storage.application.usecase.folder.dto.MetaDto;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.dto.RootSearchDto;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.FolderDoesNotExistsException;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.RootDoesNotExistsException;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.WrongFolderHandleException;
 import github.makeitvsolo.fstored.storage.domain.mapping.MetaMapper;
 
@@ -30,6 +31,10 @@ public final class FolderSearchUsecase<H extends FolderHandle> {
     public MatchingObjectsDto invoke(final RootSearchDto payload) {
         var handle = folderHandle.composeAsRoot(payload.root())
                 .unwrapOrElseThrow(WrongFolderHandleException::new);
+
+        if (!storage.exists(handle)) {
+            throw new RootDoesNotExistsException();
+        }
 
         var objects = storage.findRecursively(handle, payload.prefix())
                 .stream()

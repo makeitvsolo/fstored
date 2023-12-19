@@ -6,6 +6,7 @@ import github.makeitvsolo.fstored.storage.application.storage.handle.FolderHandl
 import github.makeitvsolo.fstored.storage.application.usecase.folder.dto.FolderContentDto;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.dto.FolderDto;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.FolderDoesNotExistsException;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.RootDoesNotExistsException;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.WrongFolderHandleException;
 import github.makeitvsolo.fstored.storage.domain.mapping.FolderMapper;
 
@@ -31,7 +32,7 @@ public final class FetchFolderUsecase<H extends FolderHandle> {
 
         return storage.find(handle)
                 .map(folder -> folder.mapBy(mapper))
-                .orElseThrow(FolderDoesNotExistsException::new);
+                .orElseThrow(RootDoesNotExistsException::new);
     }
 
     public FolderContentDto invoke(final FolderDto payload) {

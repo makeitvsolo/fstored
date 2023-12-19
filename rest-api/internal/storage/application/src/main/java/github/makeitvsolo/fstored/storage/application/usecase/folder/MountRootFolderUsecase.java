@@ -3,6 +3,7 @@ package github.makeitvsolo.fstored.storage.application.usecase.folder;
 import github.makeitvsolo.fstored.storage.application.storage.FolderStorage;
 import github.makeitvsolo.fstored.storage.application.storage.handle.ComposeFolderHandle;
 import github.makeitvsolo.fstored.storage.application.storage.handle.FolderHandle;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.RootAlreadyExistsException;
 import github.makeitvsolo.fstored.storage.application.usecase.folder.exception.WrongFolderHandleException;
 
 public final class MountRootFolderUsecase<H extends FolderHandle> {
@@ -18,6 +19,10 @@ public final class MountRootFolderUsecase<H extends FolderHandle> {
     public void invoke(final String root) {
         var handle = folderHandle.composeAsRoot(root)
                 .unwrapOrElseThrow(WrongFolderHandleException::new);
+
+        if (storage.exists(handle)) {
+            throw new RootAlreadyExistsException();
+        }
 
         storage.make(handle);
     }
