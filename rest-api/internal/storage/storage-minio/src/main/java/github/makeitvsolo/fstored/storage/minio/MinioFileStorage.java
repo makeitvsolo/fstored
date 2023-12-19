@@ -54,6 +54,12 @@ public final class MinioFileStorage implements FileStorage<MinioHandle> {
 
     @Override
     public Optional<File> find(final MinioHandle handle) {
-        return objectStorage.findFile(handle);
+        return objectStorage.findSource(handle)
+                .map(source -> new File(
+                        handle.root(),
+                        handle.path(),
+                        source.size(),
+                        source.stream()
+                ));
     }
 }
