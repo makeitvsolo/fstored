@@ -59,9 +59,9 @@ public final class MinioFolderStorage implements FolderStorage<MinioHandle> {
     @Override
     public List<MetaData> findRecursively(final MinioHandle handle, final String name) {
         var recursive = true;
-        var infix = Optional.of(name);
+        var filter = Optional.of(name);
 
-        return objectStorage.findChildren(handle, infix, recursive);
+        return objectStorage.findChildren(handle, filter, recursive);
     }
 
     @Override
@@ -71,9 +71,9 @@ public final class MinioFolderStorage implements FolderStorage<MinioHandle> {
         }
 
         var recursive = true;
-        Optional<String> infix = Optional.empty();
+        Optional<String> filter = Optional.empty();
 
-        var metas = objectStorage.findChildren(handle, infix, recursive);
+        var metas = objectStorage.findChildren(handle, filter, recursive);
         return Optional.of(new Folder(
                 handle.root(),
                 handle.path(),

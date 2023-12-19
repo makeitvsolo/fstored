@@ -221,7 +221,7 @@ public final class MinioObjectStorage {
     }
 
     public List<MetaData> findChildren(
-            final MinioHandle parent, final Optional<String> infix, final boolean recursive
+            final MinioHandle parent, final Optional<String> filter, final boolean recursive
     ) {
         try {
             var results = client.listObjects(ListObjectsArgs.builder()
@@ -232,7 +232,7 @@ public final class MinioObjectStorage {
             );
 
             var metas = new ArrayList<MetaData>();
-            var infixLowerCase = infix.map(String::toLowerCase);
+            var filterLowerCase = filter.map(String::toLowerCase);
 
             for (var result : results) {
                 var item = result.get();
@@ -243,10 +243,10 @@ public final class MinioObjectStorage {
 
                 var handle = new MinioHandle(item.objectName());
 
-                if (infixLowerCase.isPresent()) {
-                    var childLowerCase = handle.infix().toLowerCase();
+                if (filterLowerCase.isPresent()) {
+                    var handleInfixLowerCase = handle.infix().toLowerCase();
 
-                    if (!infixLowerCase.get().contains(childLowerCase)) {
+                    if (!handleInfixLowerCase.contains(filterLowerCase.get())) {
                         continue;
                     }
                 }
