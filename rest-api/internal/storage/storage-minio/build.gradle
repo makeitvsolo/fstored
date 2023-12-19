@@ -4,4 +4,8 @@ dependencies {
     implementation project(':internal:storage:application')
 
     implementation workspace.minio
+
+    testImplementation testWorkspace.junit.api
+    testImplementation testWorkspace.junit.params
+    testRuntimeOnly testWorkspace.junit.engine
 }
