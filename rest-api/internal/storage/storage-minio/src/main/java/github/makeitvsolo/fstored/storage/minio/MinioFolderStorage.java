@@ -50,7 +50,10 @@ public final class MinioFolderStorage implements FolderStorage<MinioHandle> {
 
     @Override
     public boolean exists(final MinioHandle handle) {
-        return objectStorage.exists(handle);
+        var recursive = false;
+        var objects = objectStorage.findObjects(handle.objectName(), recursive);
+
+        return !objects.isEmpty();
     }
 
     @Override
