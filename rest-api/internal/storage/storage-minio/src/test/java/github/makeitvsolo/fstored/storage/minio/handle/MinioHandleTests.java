@@ -80,4 +80,18 @@ public class MinioHandleTests extends FstoredStorageMinioUnitTest {
 
         assertEquals(expectedPath, handle.path());
     }
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "->", textBlock = """
+            root/               ->  root
+            root/name.ext       ->  name.ext
+            root/path/          ->  path
+            root/path/inner/    ->  inner
+            root/path/name.ext  ->  name.ext
+            """)
+    public void infix_ReturnsInfix(String objectName, String expectedPath) {
+        var handle = MinioHandle.fromObjectName(objectName).unwrap();
+
+        assertEquals(expectedPath, handle.infix());
+    }
 }
