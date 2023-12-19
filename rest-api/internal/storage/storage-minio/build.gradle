@@ -2,4 +2,6 @@ dependencies {
     implementation project(':internal:core')
     implementation project(':internal:storage:domain')
     implementation project(':internal:storage:application')
+
+    implementation workspace.minio
 }
