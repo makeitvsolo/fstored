@@ -3,4 +3,9 @@ dependencies {
     implementation project(':internal:storage:domain')
     implementation project(':internal:storage:application')
     implementation project(':internal:storage:storage-minio')
+
+    testImplementation testWorkspace.junit.api
+    testRuntimeOnly testWorkspace.junit.engine
+    testImplementation testWorkspace.testcontainers
+    testImplementation testWorkspace.testcontainers.junit
 }
