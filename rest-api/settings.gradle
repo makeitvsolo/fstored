@@ -21,8 +21,11 @@ dependencyResolutionManagement {
 
         workspace {
             def minio = version('minio', '8.5.7')
+            def bcrypt = version('bcrypt', '0.10.2')
 
             library('minio', 'io.minio', 'minio').versionRef(minio)
+
+            library('bcrypt', 'at.favre.lib', 'bcrypt').versionRef(bcrypt)
         }
 
         testWorkspace {
