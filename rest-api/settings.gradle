@@ -10,6 +10,7 @@ include 'internal:storage:tests'
 
 include 'internal:user-access'
 include 'internal:user-access:domain'
+include 'internal:user-access:application'
 
 dependencyResolutionManagement {
     versionCatalogs {
