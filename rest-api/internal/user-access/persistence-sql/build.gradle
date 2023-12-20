@@ -2,4 +2,7 @@ dependencies {
     implementation(project(':internal:core'))
     implementation(project(':internal:user-access:domain'))
     implementation(project(':internal:user-access:application'))
+
+    implementation workspace.postgres
+    implementation workspace.postgres.hikaricp
 }

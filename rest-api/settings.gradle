@@ -23,10 +23,15 @@ dependencyResolutionManagement {
         workspace {
             def minio = version('minio', '8.5.7')
             def bcrypt = version('bcrypt', '0.10.2')
+            def postgres = version('postgres', '42.6.0')
+            def hikari = version('hikari', '5.1.0')
 
             library('minio', 'io.minio', 'minio').versionRef(minio)
 
             library('bcrypt', 'at.favre.lib', 'bcrypt').versionRef(bcrypt)
+
+            library('postgres', 'org.postgresql', 'postgresql').versionRef(postgres)
+            library('postgres-hikaricp', 'com.zaxxer', 'HikariCP').versionRef(hikari)
         }
 
         testWorkspace {
