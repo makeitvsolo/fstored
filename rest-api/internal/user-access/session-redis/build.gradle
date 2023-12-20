@@ -4,4 +4,7 @@ dependencies {
     implementation(project(':internal:user-access:application'))
 
     implementation workspace.jedis
+
+    testImplementation testWorkspace.junit.api
+    testRuntimeOnly testWorkspace.junit.engine
 }
