@@ -14,6 +14,7 @@ include 'internal:user-access:application'
 include 'internal:user-access:encoding-bcrypt'
 include 'internal:user-access:persistence-sql'
 include 'internal:user-access:session-redis'
+include 'internal:user-access:tests'
 
 dependencyResolutionManagement {
     versionCatalogs {
