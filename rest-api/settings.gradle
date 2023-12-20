@@ -26,6 +26,7 @@ dependencyResolutionManagement {
             def bcrypt = version('bcrypt', '0.10.2')
             def postgres = version('postgres', '42.6.0')
             def hikari = version('hikari', '5.1.0')
+            def jedis = version('jedis', '5.0.2')
 
             library('minio', 'io.minio', 'minio').versionRef(minio)
 
@@ -33,6 +34,8 @@ dependencyResolutionManagement {
 
             library('postgres', 'org.postgresql', 'postgresql').versionRef(postgres)
             library('postgres-hikaricp', 'com.zaxxer', 'HikariCP').versionRef(hikari)
+
+            library('jedis', 'redis.clients', 'jedis').versionRef(jedis)
         }
 
         testWorkspace {
