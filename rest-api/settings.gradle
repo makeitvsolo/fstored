@@ -9,6 +9,7 @@ include 'internal:storage:storage-minio'
 include 'internal:storage:tests'
 
 include 'internal:user-access'
+include 'internal:user-access:domain'
 
 dependencyResolutionManagement {
     versionCatalogs {
