@@ -12,6 +12,7 @@ include 'internal:user-access'
 include 'internal:user-access:domain'
 include 'internal:user-access:application'
 include 'internal:user-access:encoding-bcrypt'
+include 'internal:user-access:persistence-sql'
 
 dependencyResolutionManagement {
     versionCatalogs {
