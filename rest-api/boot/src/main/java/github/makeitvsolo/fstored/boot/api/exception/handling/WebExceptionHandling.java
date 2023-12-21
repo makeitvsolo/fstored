@@ -1,11 +1,13 @@
 package github.makeitvsolo.fstored.boot.api.exception.handling;
 
 import github.makeitvsolo.fstored.boot.api.message.ErrorMessage;
+import github.makeitvsolo.fstored.boot.config.spring.session.cookie.SessionCookie;
 import github.makeitvsolo.fstored.boot.config.spring.session.exception.MissingSessionException;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.exception.SessionAlreadyExpiredException;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.exception.SessionDoesNotExistsException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -37,7 +39,10 @@ public class WebExceptionHandling {
     @ExceptionHandler({SessionDoesNotExistsException.class, SessionAlreadyExpiredException.class})
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ResponseEntity<?> handleMissingSession(final Throwable ex) {
+        var removeCookie = SessionCookie.remove();
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, removeCookie.toString())
                 .body(ErrorMessage.from(HttpStatus.UNAUTHORIZED, "invalid session", ex.getMessage()));
     }
 
