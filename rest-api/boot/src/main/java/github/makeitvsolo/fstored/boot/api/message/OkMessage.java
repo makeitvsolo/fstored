@@ -3,6 +3,8 @@ package github.makeitvsolo.fstored.boot.api.message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;
 
+import java.util.Optional;
+
 public record OkMessage<D>(
 
         @JsonProperty("status_code")
@@ -12,14 +14,22 @@ public record OkMessage<D>(
         String status,
 
         @JsonProperty("data")
-        D data
+        Optional<D> data
 ) {
+
+    public static <T> OkMessage<T> from(final HttpStatus status) {
+        return new OkMessage<>(
+                status.value(),
+                status.getReasonPhrase(),
+                Optional.empty()
+        );
+    }
 
     public static <T> OkMessage<T> from(final HttpStatus status, final T data) {
         return new OkMessage<>(
                 status.value(),
                 status.getReasonPhrase(),
-                data
+                Optional.of(data)
         );
     }
 }
