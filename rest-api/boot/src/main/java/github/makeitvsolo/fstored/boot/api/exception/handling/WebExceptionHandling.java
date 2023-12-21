@@ -24,7 +24,7 @@ public class WebExceptionHandling {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ResponseEntity<?> handleInvalidPayload(final Throwable ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorMessage.from(HttpStatus.BAD_REQUEST, "invalid payload", "invalid params"));
+                .body(ErrorMessage.from(HttpStatus.BAD_REQUEST, "invalid payload"));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -43,7 +43,7 @@ public class WebExceptionHandling {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .header(HttpHeaders.SET_COOKIE, removeCookie.toString())
-                .body(ErrorMessage.from(HttpStatus.UNAUTHORIZED, "invalid session", ex.getMessage()));
+                .body(ErrorMessage.from(HttpStatus.UNAUTHORIZED, ex.getMessage()));
     }
 
     @ExceptionHandler(MissingSessionException.class)

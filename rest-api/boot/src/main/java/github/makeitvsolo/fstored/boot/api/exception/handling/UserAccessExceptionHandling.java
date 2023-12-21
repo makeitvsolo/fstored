@@ -25,6 +25,6 @@ public class UserAccessExceptionHandling {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ResponseEntity<?> handleUnauthorizedException(final Throwable ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorMessage.from(HttpStatus.UNAUTHORIZED, "invalid credentials", ex.getMessage()));
+                .body(ErrorMessage.from(HttpStatus.UNAUTHORIZED, ex.getMessage()));
     }
 }
