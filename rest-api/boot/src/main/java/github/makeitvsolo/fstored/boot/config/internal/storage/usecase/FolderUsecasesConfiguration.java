@@ -4,7 +4,12 @@ import github.makeitvsolo.fstored.storage.application.mapping.IntoFolderContentD
 import github.makeitvsolo.fstored.storage.application.mapping.IntoMetaDtoMapper;
 import github.makeitvsolo.fstored.storage.application.storage.FolderStorage;
 import github.makeitvsolo.fstored.storage.application.storage.handle.ComposeFolderHandle;
-import github.makeitvsolo.fstored.storage.application.usecase.folder.*;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.FetchFolderUsecase;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.FolderSearchUsecase;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.MakeFolderUsecase;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.MountRootFolderUsecase;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.MoveFolderUsecase;
+import github.makeitvsolo.fstored.storage.application.usecase.folder.RemoveFolderUsecase;
 import github.makeitvsolo.fstored.storage.minio.handle.MinioHandle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

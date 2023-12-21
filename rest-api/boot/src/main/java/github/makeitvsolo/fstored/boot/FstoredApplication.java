@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class FstoredApplication {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(FstoredApplication.class, args);
     }
 }
