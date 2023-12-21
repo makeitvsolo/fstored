@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -20,11 +21,23 @@ import org.springframework.web.multipart.MultipartException;
 @RestControllerAdvice
 public class WebExceptionHandling {
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, MissingServletRequestParameterException.class})
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class,
+            MissingServletRequestParameterException.class,
+    })
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ResponseEntity<?> handleInvalidPayload(final Throwable ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorMessage.from(HttpStatus.BAD_REQUEST, "invalid payload"));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public ResponseEntity<?> handleHttpMediaTypeNotSupportedException(
+            final HttpMediaTypeNotSupportedException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .build();
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -62,8 +75,6 @@ public class WebExceptionHandling {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> otherwise(final Throwable ex) {
-        System.out.println(ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorMessage.from(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error"));
     }

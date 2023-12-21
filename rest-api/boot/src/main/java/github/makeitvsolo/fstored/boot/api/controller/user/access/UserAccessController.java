@@ -42,7 +42,7 @@ public class UserAccessController {
         this.mountRootFolderUsecase = mountRootFolderUsecase;
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping(value = "/sign-up", consumes = "application/json")
     public ResponseEntity<?> signUp(
             @Valid @RequestBody final UserCredentialsRequest credentials
     ) {
@@ -56,7 +56,7 @@ public class UserAccessController {
                 .body(OkMessage.from(HttpStatus.CREATED));
     }
 
-    @PostMapping("/sign-in")
+    @PostMapping(value = "/sign-in", consumes = "application/json")
     public ResponseEntity<?> signIn(
             @Valid @RequestBody final UserCredentialsRequest credentials
     ) {
@@ -71,7 +71,7 @@ public class UserAccessController {
                 .body(OkMessage.from(HttpStatus.OK, access));
     }
 
-    @PostMapping("/sign-out")
+    @PostMapping(value = "/sign-out", consumes = "application/json")
     public ResponseEntity<?> signOut(@SessionToken final String token) {
         signOutUserUsecase.invoke(token);
 
@@ -82,7 +82,7 @@ public class UserAccessController {
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
 
-    @GetMapping("/active")
+    @GetMapping(value = "/active", consumes = "application/json")
     public ResponseEntity<?> active(@Authenticated final UserDto activeUser) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(OkMessage.from(HttpStatus.OK, activeUser));
