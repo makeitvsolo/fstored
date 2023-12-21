@@ -1,5 +1,6 @@
 package github.makeitvsolo.fstored.boot.api.message;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;
 
@@ -14,6 +15,7 @@ public record OkMessage<D>(
         String status,
 
         @JsonProperty("data")
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         Optional<D> data
 ) {
 

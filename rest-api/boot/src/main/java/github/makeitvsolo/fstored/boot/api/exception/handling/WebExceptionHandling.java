@@ -62,6 +62,8 @@ public class WebExceptionHandling {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> otherwise(final Throwable ex) {
+        System.out.println(ex.getMessage());
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorMessage.from(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error"));
     }
