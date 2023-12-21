@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - ~/data/postgres:/var/lib/postgresql/data/
+      - ../rest-api/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: cloud-storage
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: userpassword
+    ports:
+      - "5432:5432"
+  
+  redis:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - ~/data/redis:/var/lib/redis 
+    ports:
+      - "6379:6379"
+    command: redis-server
+
+  minio:
+    image: minio/minio:latest
+    restart: always
+    volumes:
+      - ~/data/minio:/data
+    environment:
+      MINIO_ROOT_USER: username
+      MINIO_ROOT_PASSWORD: userpassword
+      MINIO_ROOT_BUCKET: userbucket
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server --console-address ":9001" /data

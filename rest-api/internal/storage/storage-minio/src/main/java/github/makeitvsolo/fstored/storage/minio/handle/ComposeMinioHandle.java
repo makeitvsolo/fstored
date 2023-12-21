@@ -13,7 +13,7 @@ public final class ComposeMinioHandle
     private static final String FILE_PATH_REGEX = "^/([0-9a-zA-Z-_.]+)(/([0-9a-zA-Z-_.]+))*$";
     private static final String RELATIVE_FILE_PATH_REGEX = "^[^/][0-9a-zA-Z-_./]+[^/]$";
 
-    private static final String PATH_DELIMITER = "/";
+    private static final String ROOT_PATH = "/";
 
     @Override
     public Result<MinioHandle> composeAsRoot(final String root) {
@@ -21,7 +21,7 @@ public final class ComposeMinioHandle
             return Result.err(new WrongMinioHandleError("invalid root name"));
         }
 
-        var objectName = root.concat(PATH_DELIMITER);
+        var objectName = root.concat(ROOT_PATH);
         return Result.ok(new MinioHandle(objectName));
     }
 
@@ -31,7 +31,7 @@ public final class ComposeMinioHandle
             return Result.err(new WrongMinioHandleError("invalid root name"));
         }
 
-        if (!path.matches(FOLDER_PATH_REGEX)) {
+        if (!path.matches(FOLDER_PATH_REGEX) || path.equals(ROOT_PATH)) {
             return Result.err(new WrongMinioHandleError("invalid folder path"));
         }
 

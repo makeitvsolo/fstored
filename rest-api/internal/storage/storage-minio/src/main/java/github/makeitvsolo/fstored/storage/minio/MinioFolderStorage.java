@@ -70,7 +70,7 @@ public final class MinioFolderStorage implements FolderStorage<MinioHandle> {
             return Optional.empty();
         }
 
-        var recursive = true;
+        var recursive = false;
         Optional<String> filter = Optional.empty();
 
         var metas = objectStorage.findChildren(handle, filter, recursive);
