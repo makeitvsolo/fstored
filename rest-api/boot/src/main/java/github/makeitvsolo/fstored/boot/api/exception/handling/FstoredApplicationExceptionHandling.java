@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Import({
         WebExceptionHandling.class,
-        UserAccessExceptionHandling.class
+        UserAccessExceptionHandling.class,
+        StorageExceptionHandling.class
 })
 @RestControllerAdvice
 public class FstoredApplicationExceptionHandling {
