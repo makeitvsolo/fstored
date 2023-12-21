@@ -12,4 +12,7 @@ dependencies {
     implementation(project(':internal:user-access:encoding-bcrypt'))
     implementation(project(':internal:user-access:persistence-sql'))
     implementation(project(':internal:user-access:session-redis'))
+
+    implementation boot.spring.web
+    implementation boot.spring.validation
 }

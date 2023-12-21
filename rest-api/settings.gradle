@@ -21,7 +21,10 @@ include 'internal:user-access:tests'
 dependencyResolutionManagement {
     versionCatalogs {
         boot {
+            def spring = version('spirng', '3.1.5')
 
+            library('spring-web', 'org.springframework.boot', 'spring-boot-starter-web').versionRef(spring)
+            library('spring-validation', 'org.springframework.boot', 'spring-boot-starter-validation').versionRef(spring)
         }
 
         workspace {
