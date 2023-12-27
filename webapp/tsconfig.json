@@ -23,6 +23,7 @@
     "baseUrl": "./src",
     "paths": {
       "@app": ["./App"],
+      "@api": ["./api/index.ts"],
       "@pages": ["./pages/index.ts"]
     }
   },
