@@ -25,6 +25,7 @@
       "@app": ["./App"],
       "@api": ["./api/index.ts"],
       "@store": ["./store/index.ts"],
+      "@service": ["./service/index.ts"],
       "@pages": ["./pages/index.ts"]
     }
   },
