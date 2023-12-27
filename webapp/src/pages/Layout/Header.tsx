@@ -12,7 +12,7 @@ import {
 const Bar = () => {
   return (
     <ButtonGroup spacing={8}>
-      <Button colorScheme="blue">Sign in</Button>
+      <Button as={ReactRouterLink} colorScheme="blue" to="/sign">Sign in</Button>
     </ButtonGroup>
   );
 };
