@@ -22,7 +22,8 @@
 
     "baseUrl": "./src",
     "paths": {
-      "@app": ["./App"]
+      "@app": ["./App"],
+      "@pages": ["./pages/index.ts"]
     }
   },
   "include": ["src"],
