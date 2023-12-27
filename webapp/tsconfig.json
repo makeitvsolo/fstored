@@ -24,6 +24,7 @@
     "paths": {
       "@app": ["./App"],
       "@api": ["./api/index.ts"],
+      "@store": ["./store/index.ts"],
       "@pages": ["./pages/index.ts"]
     }
   },
