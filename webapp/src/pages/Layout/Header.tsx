@@ -1,4 +1,4 @@
-import { Link as ReactRouterLink } from "react-router-dom";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { AtSignIcon, ChevronDownIcon, NotAllowedIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -15,9 +15,20 @@ import {
 } from "@chakra-ui/react";
 
 import { useUserStore } from "@store";
+import { useSignOut } from "@service";
 
 const Bar = () => {
+  const navigate = useNavigate();
+
   const user = useUserStore((state) => state.activeUser);
+  const { execute } = useSignOut();
+
+  const onOut = async () => {
+    const msg = await execute();
+    if (msg.ok) {
+      navigate("/");
+    }
+  };
 
   return (
     <ButtonGroup spacing={8}>
@@ -32,7 +43,9 @@ const Bar = () => {
             {user.name}
           </MenuButton>
           <MenuList>
-            <MenuItem icon={<NotAllowedIcon />}>Sign out</MenuItem>
+            <MenuItem icon={<NotAllowedIcon />} onClick={onOut}>
+              Sign out
+            </MenuItem>
           </MenuList>
         </Menu>
       ) : (
