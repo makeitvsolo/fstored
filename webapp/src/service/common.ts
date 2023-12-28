@@ -31,30 +31,26 @@ export const useAuthenticatedRequest = <
 ) => {
   const loading = useRef(false);
 
-  const user = useUserStore((state) => state.activeUser);
   const removeUser = useUserStore((state) => state.removeActiveUser);
 
   const execute = async (
     ...args: Parameters<RequestFn>
   ): Promise<ReturnType<RequestFn>> => {
-    loading.current = true;
+    try {
+      loading.current = true;
 
-    if (user === null) {
+      const response = await requestFn(...args);
+
       loading.current = false;
-      throw new Error("there is no active user");
-    }
-
-    const response = await requestFn(...args).catch((err) => {
+      return response;
+    } catch (err) {
       if ((err as Err).statusCode === 401) {
         removeUser();
       }
 
       loading.current = false;
       throw err;
-    });
-
-    loading.current = false;
-    return response;
+    }
   };
 
   return {
