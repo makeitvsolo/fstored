@@ -7,7 +7,7 @@ export const Home = () => {
       <Heading as="h1" size="4xl" lineHeight="tall">
         <Highlight
           query="Fstored"
-          styles={{ px: "6", py: "4", rounded: "full", bg: "blue.100" }}
+          styles={{ px: "6", py: "4", rounded: "full", bg: "blue.200" }}
         >
           FStored
         </Highlight>

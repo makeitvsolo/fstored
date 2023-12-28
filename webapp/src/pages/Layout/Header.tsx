@@ -1,5 +1,11 @@
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import { AtSignIcon, ChevronDownIcon, NotAllowedIcon } from "@chakra-ui/icons";
+import {
+  AtSignIcon,
+  ChevronDownIcon,
+  MoonIcon,
+  NotAllowedIcon,
+  SunIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -7,11 +13,13 @@ import {
   Container,
   Flex,
   Heading,
+  IconButton,
   Link,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  useColorMode,
 } from "@chakra-ui/react";
 
 import { useUserStore } from "@store";
@@ -19,6 +27,7 @@ import { useSignOut } from "@service";
 
 const Bar = () => {
   const navigate = useNavigate();
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const user = useUserStore((state) => state.activeUser);
   const { execute } = useSignOut();
@@ -32,6 +41,13 @@ const Bar = () => {
 
   return (
     <ButtonGroup spacing={8}>
+      <IconButton
+        aria-label="switch-theme"
+        colorScheme="blue"
+        variant="ghost"
+        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+        onClick={toggleColorMode}
+      />
       {user !== null ? (
         <Menu>
           <MenuButton
@@ -58,8 +74,10 @@ const Bar = () => {
 };
 
 export const Header = () => {
+  const { colorMode } = useColorMode();
+
   return (
-    <Box py={3} bg="blue.100">
+    <Box py={3} bg={colorMode === "light" ? "blue.200" : "gray.700"}>
       <Container maxW="container.xl">
         <Flex justifyContent="space-between" alignItems="center">
           <Heading>
