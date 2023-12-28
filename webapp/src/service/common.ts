@@ -11,11 +11,15 @@ export const useRequest = <RequestFn extends (...args: any[]) => Promise<any>>(
   const execute = async (
     ...args: Parameters<RequestFn>
   ): Promise<ReturnType<RequestFn>> => {
-    loading.current = true;
-    const response = await requestFn(...args);
-    loading.current = false;
-
-    return response;
+    try {
+      loading.current = true;
+      const response = await requestFn(...args);
+      loading.current = false;
+      return response;
+    } catch (err) {
+      loading.current = false;
+      throw err;
+    }
   };
 
   return {
