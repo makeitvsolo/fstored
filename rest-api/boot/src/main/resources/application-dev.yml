@@ -11,7 +11,7 @@ server:
 
 web:
   cors:
-    allowed-origins: "http://localhost:8080"
+    allowed-origins: "http://localhost:8080,http://localhost:5173"
     allowed-headers: "Access-Control-Allow-Origin,Access-Control-Allow-Origin,Accept,Accept-Language,Content-Type,Content-Length,Cookie"
     allowed-methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
 
