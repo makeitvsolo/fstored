@@ -14,6 +14,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  FormHelperText,
 } from "@chakra-ui/react";
 
 import { useSignIn, Message } from "@service";
@@ -57,6 +58,7 @@ const SignInForm = () => {
               setCredentials({ ...credentials, name: e.target.value })
             }
           />
+          <FormHelperText>Minimum 5 symbols.</FormHelperText>
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Password</FormLabel>
@@ -67,6 +69,7 @@ const SignInForm = () => {
               setCredentials({ ...credentials, password: e.target.value })
             }
           />
+          <FormHelperText>Minimum 5 symbols.</FormHelperText>
         </FormControl>
         <Button
           colorScheme="blue"
