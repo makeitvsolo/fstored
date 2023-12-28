@@ -1,5 +1,5 @@
 import { Err, usersApi } from "@api";
-import { useRequest } from "@service";
+import { useAuthenticatedRequest, useRequest } from "@service";
 import { useUserStore } from "@store";
 
 export interface Message {
@@ -49,6 +49,40 @@ export const useSignIn = () => {
 
       return {
         ok: "user signed",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading: loading,
+    execute: proxy,
+  };
+};
+
+export const useSignOut = () => {
+  const { loading, execute } = useAuthenticatedRequest(usersApi.signOut);
+  const removeUser = useUserStore((state) => state.removeActiveUser);
+
+  const proxy = async () => {
+    try {
+      await execute();
+      removeUser();
+
+      return {
+        ok: "user unsigned",
         error: null,
       } as Message;
     } catch (err) {
