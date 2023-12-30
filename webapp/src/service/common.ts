@@ -48,7 +48,7 @@ export const useAuthenticatedRequest = <
       loading.current = false;
       return response;
     } catch (err) {
-      if ((err as Err).statusCode === 401) {
+      if ((err as Err).status_code === 401) {
         removeUser();
       }
 

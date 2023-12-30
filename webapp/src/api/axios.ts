@@ -3,13 +3,13 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export interface Ok<T> {
-  statusCode: number;
+  status_code: number;
   status: string;
   data: T;
 }
 
 export interface Err {
-  statusCode: number;
+  status_code: number;
   error: string;
   details: string;
 }
