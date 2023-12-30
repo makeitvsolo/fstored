@@ -85,7 +85,7 @@ public class FolderController {
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
 
-    @GetMapping(value = "/**", consumes = "application/json")
+    @GetMapping(value = "/**", produces = "application/json")
     public ResponseEntity<?> fetchFolder(
             final HttpServletRequest request,
             @Authenticated final UserDto activeUser,

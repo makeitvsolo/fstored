@@ -112,7 +112,7 @@ public class FileController {
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
 
-    @GetMapping(value = "/**", consumes = "application/json")
+    @GetMapping(value = "/**")
     public ResponseEntity<?> fetchFile(
             final HttpServletRequest request,
             @Authenticated final UserDto activeUser
