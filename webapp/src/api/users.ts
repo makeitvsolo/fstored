@@ -55,7 +55,7 @@ export const usersApi = {
     await api.post(
         "/user-access/sign-out",
 
-        {},
+        null,
 
         {
           headers: {
