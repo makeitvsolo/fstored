@@ -4,25 +4,30 @@ import {
   Box,
   Button,
   ButtonGroup,
+  ColorMode,
   Container,
   Flex,
   Heading,
   IconButton,
   Link,
-  useColorMode,
 } from "@chakra-ui/react";
 
-const Bar = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
+export interface BarProps {
+  theme: ColorMode;
+  toggleTheme: () => void;
+}
 
+export interface HeaderProps extends BarProps {}
+
+const Bar = ({ theme, toggleTheme }: BarProps) => {
   return (
     <ButtonGroup spacing={8}>
       <IconButton
         aria-label="switch-theme"
         colorScheme="blue"
         variant="ghost"
-        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-        onClick={toggleColorMode}
+        icon={theme === "light" ? <MoonIcon /> : <SunIcon />}
+        onClick={toggleTheme}
       />
       <Button as={ReactRouterLink} colorScheme="blue" to="/sign">
         Sign in
@@ -31,11 +36,9 @@ const Bar = () => {
   );
 };
 
-export const Header = () => {
-  const { colorMode } = useColorMode();
-
+export const Header = ({ theme, toggleTheme }: HeaderProps) => {
   return (
-    <Box py={3} bg={colorMode === "light" ? "blue.200" : "gray.700"}>
+    <Box py={3} bg={theme === "light" ? "blue.200" : "gray.700"}>
       <Container maxW="container.xl">
         <Flex justifyContent="space-between" alignItems="center">
           <Heading>
@@ -43,7 +46,7 @@ export const Header = () => {
               FStored
             </Link>
           </Heading>
-          <Bar />
+          <Bar theme={theme} toggleTheme={toggleTheme} />
         </Flex>
       </Container>
     </Box>

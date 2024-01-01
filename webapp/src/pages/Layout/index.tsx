@@ -1,12 +1,14 @@
-import { Divider } from "@chakra-ui/react";
+import { Divider, useColorMode } from "@chakra-ui/react";
 
 import { Header } from "./Header";
 import { Main } from "./Main";
 
 export const Layout = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
     <>
-      <Header />
+      <Header theme={colorMode} toggleTheme={toggleColorMode} />
       <Divider />
       <Main />
     </>
