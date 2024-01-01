@@ -26,7 +26,7 @@ export const foldersApi = {
     await api.post(
       `/storage/folders${path}`,
 
-      {},
+      null,
 
       {
         headers: {
@@ -38,76 +38,36 @@ export const foldersApi = {
 
   move: async (source: string, destination: string): Promise<void> => {
     await api.post(
-      `/storage/folders${destination}?mvfrom=${source}`,
+      `/storage/folders${destination}`,
 
-      {},
+      null,
 
       {
         headers: {
           "Content-Type": "application/json",
         },
+        params: { mvfrom: source },
       }
     );
   },
 
   remove: async (path: string): Promise<void> => {
-    await api.delete(
-      `/storage/folders${path}`,
-
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  },
-
-  root: async (): Promise<FolderContent> => {
-    return await api.get("/storage/folders", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await api.delete(`/storage/folders${path}`);
   },
 
   folder: async (path: string): Promise<FolderContent> => {
-    return await api.get(`/storage/folders${path}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return await api.get(`/storage/folders${path}`);
   },
 
-  fullSearch: async (resource: string): Promise<MatchingResources> => {
-    return await api.get(`/storage/folders?search=${resource}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  },
-
-  relativeSearch: async (
-    path: string,
-    resource: string
-  ): Promise<MatchingResources> => {
-    return await api.get(`/storage/folders${path}?search=${resource}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  search: async (resource: string): Promise<MatchingResources> => {
+    return await api.get("/storage/folders", {
+      params: { search: resource },
     });
   },
 };
 
 export const filesApi = {
-  upload: async (files: FormData): Promise<void> => {
-    await api.post("/storage/files", files, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  },
-
-  uploadToFolder: async (path: string, files: FormData): Promise<void> => {
+  upload: async (path: string, files: FormData): Promise<void> => {
     await api.post(`/storage/files${path}`, files, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -117,27 +77,20 @@ export const filesApi = {
 
   move: async (source: string, destination: string): Promise<void> => {
     await api.post(
-      `/storage/files${destination}?mvfrom=${source}`,
+      `/storage/files${destination}`,
 
-      {},
+      null,
 
       {
         headers: {
           "Content-Type": "application/json",
         },
+        params: { mvfrom: source },
       }
     );
   },
 
-  overwrite: async (files: FormData): Promise<void> => {
-    await api.put("/storage/files", files, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  },
-
-  overwriteToFolder: async (path: string, files: FormData): Promise<void> => {
+  overwrite: async (path: string, files: FormData): Promise<void> => {
     await api.put(`/storage/files${path}`, files, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -146,18 +99,11 @@ export const filesApi = {
   },
 
   remove: async (path: string): Promise<void> => {
-    await api.delete(`/storage/files${path}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await api.delete(`/storage/files${path}`);
   },
 
   download: async (path: string): Promise<void> => {
     await api.get(`/storage/files${path}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
       responseType: "blob",
     });
   },
