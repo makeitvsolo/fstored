@@ -98,7 +98,7 @@ public class FileController {
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
 
-    @DeleteMapping(value = "/**", consumes = "application/json")
+    @DeleteMapping(value = "/**")
     public ResponseEntity<?> removeFile(
             final HttpServletRequest request,
             @Authenticated final UserDto activeUser

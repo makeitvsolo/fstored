@@ -71,7 +71,7 @@ public class FolderController {
                 .body(OkMessage.from(HttpStatus.CREATED));
     }
 
-    @DeleteMapping(value = "/**", consumes = "application/json")
+    @DeleteMapping(value = "/**")
     public ResponseEntity<?> deleteFolder(
             final HttpServletRequest request,
             @Authenticated final UserDto activeUser
@@ -85,7 +85,7 @@ public class FolderController {
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
 
-    @GetMapping(value = "/**", produces = "application/json")
+    @GetMapping(value = "/**")
     public ResponseEntity<?> fetchFolder(
             final HttpServletRequest request,
             @Authenticated final UserDto activeUser,
