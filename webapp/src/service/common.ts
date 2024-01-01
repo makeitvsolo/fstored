@@ -43,7 +43,7 @@ export const useMutation = <MutationFn extends (...args: any[]) => any>(
 
   const removeUser = useUserStore((state) => state.removeActiveUser);
 
-  const proxy = async (...args: Parameters<MutationFn>) => {
+  const proxy = async (...args: Parameters<MutationFn>): Promise<ReturnType<MutationFn>> => {
     try {
       loading.current = true;
 
