@@ -1,11 +1,5 @@
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
-import {
-  AtSignIcon,
-  ChevronDownIcon,
-  MoonIcon,
-  NotAllowedIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { Link as ReactRouterLink } from "react-router-dom";
+import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -15,29 +9,11 @@ import {
   Heading,
   IconButton,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   useColorMode,
 } from "@chakra-ui/react";
 
-import { useUserStore } from "@store";
-import { useSignOut } from "@service";
-
 const Bar = () => {
-  const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
-
-  const user = useUserStore((state) => state.activeUser);
-  const { execute } = useSignOut();
-
-  const onOut = async () => {
-    const msg = await execute();
-    if (msg.ok) {
-      navigate("/");
-    }
-  };
 
   return (
     <ButtonGroup spacing={8}>
@@ -48,27 +24,9 @@ const Bar = () => {
         icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
         onClick={toggleColorMode}
       />
-      {user !== null ? (
-        <Menu>
-          <MenuButton
-            as={Button}
-            leftIcon={<AtSignIcon />}
-            rightIcon={<ChevronDownIcon />}
-            colorScheme="blue"
-          >
-            {user.name}
-          </MenuButton>
-          <MenuList>
-            <MenuItem icon={<NotAllowedIcon />} onClick={onOut}>
-              Sign out
-            </MenuItem>
-          </MenuList>
-        </Menu>
-      ) : (
-        <Button as={ReactRouterLink} colorScheme="blue" to="/sign">
-          Sign in
-        </Button>
-      )}
+      <Button as={ReactRouterLink} colorScheme="blue" to="/sign">
+        Sign in
+      </Button>
     </ButtonGroup>
   );
 };
