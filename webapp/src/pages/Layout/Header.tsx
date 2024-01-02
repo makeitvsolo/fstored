@@ -1,5 +1,5 @@
 import { Link as ReactRouterLink } from "react-router-dom";
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { AtSignIcon, MoonIcon, NotAllowedIcon, SunIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,16 +10,25 @@ import {
   Heading,
   IconButton,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
 } from "@chakra-ui/react";
+import { useUserStore } from "@store";
 
 export interface BarProps {
   theme: ColorMode;
   toggleTheme: () => void;
+  
+  onSignOut: () => Promise<void>;
 }
 
 export interface HeaderProps extends BarProps {}
 
-const Bar = ({ theme, toggleTheme }: BarProps) => {
+const Bar = ({ theme, toggleTheme, onSignOut }: BarProps) => {
+  const user = useUserStore((state) => state.activeUser);
+  
   return (
     <ButtonGroup spacing={8}>
       <IconButton
@@ -29,14 +38,31 @@ const Bar = ({ theme, toggleTheme }: BarProps) => {
         icon={theme === "light" ? <MoonIcon /> : <SunIcon />}
         onClick={toggleTheme}
       />
-      <Button as={ReactRouterLink} colorScheme="blue" to="/sign">
-        Sign in
-      </Button>
+      {user !== null ? (
+        <Menu>
+          <MenuButton
+            as={Button}
+            leftIcon={<AtSignIcon />}
+            colorScheme="blue"
+          >
+            {user.name}
+          </MenuButton>
+          <MenuList>
+            <MenuItem icon={<NotAllowedIcon />} onClick={onSignOut}>
+              Sign out
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      ) : (
+        <Button as={ReactRouterLink} colorScheme="blue" to="/sign">
+          Sign in
+        </Button>
+      )}
     </ButtonGroup>
   );
 };
 
-export const Header = ({ theme, toggleTheme }: HeaderProps) => {
+export const Header = ({ theme, toggleTheme, onSignOut }: HeaderProps) => {
   return (
     <Box py={3} bg={theme === "light" ? "blue.200" : "gray.700"}>
       <Container maxW="container.xl">
@@ -46,7 +72,7 @@ export const Header = ({ theme, toggleTheme }: HeaderProps) => {
               FStored
             </Link>
           </Heading>
-          <Bar theme={theme} toggleTheme={toggleTheme} />
+          <Bar theme={theme} toggleTheme={toggleTheme} onSignOut={onSignOut} />
         </Flex>
       </Container>
     </Box>
