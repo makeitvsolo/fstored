@@ -7,7 +7,7 @@ export const useQuery = <QueryFn extends (...args: any[]) => any>(
   fn: QueryFn
 ) => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Awaited<ReturnType<typeof fn>>["data"] | null>(null);
+  const [data, setData] = useState<Awaited<ReturnType<QueryFn>> | null>(null);
 
   const removeUser = useUserStore((state) => state.removeActiveUser);
 
