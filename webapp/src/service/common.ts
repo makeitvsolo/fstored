@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 import { Err } from "@api";
 import { useUserStore } from "@store";
@@ -6,25 +6,25 @@ import { useUserStore } from "@store";
 export const useQuery = <QueryFn extends (...args: any[]) => any>(
   fn: QueryFn
 ) => {
-  const loading = useRef(false);
-  const data = useRef<Awaited<ReturnType<typeof fn>>["data"] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Awaited<ReturnType<typeof fn>>["data"] | null>(null);
 
   const removeUser = useUserStore((state) => state.removeActiveUser);
 
   const proxy = async (...args: Parameters<QueryFn>) => {
     try {
-      loading.current = true;
+      setLoading(true);
 
-      const response = await fn(args);
-      data.current = response;
+      const response = await fn(...args);
+      setData(response);
 
-      loading.current = false;
+      setLoading(false);
     } catch (err) {
       if ((err as Err).status_code === 401) {
         removeUser();
       }
 
-      loading.current = false;
+      setLoading(false);
       throw err;
     }
   };
@@ -39,24 +39,24 @@ export const useQuery = <QueryFn extends (...args: any[]) => any>(
 export const useMutation = <MutationFn extends (...args: any[]) => any>(
   fn: MutationFn
 ) => {
-  const loading = useRef(false);
+  const [loading, setLoading] = useState(false);
 
   const removeUser = useUserStore((state) => state.removeActiveUser);
 
   const proxy = async (...args: Parameters<MutationFn>): Promise<ReturnType<MutationFn>> => {
     try {
-      loading.current = true;
+      setLoading(true);
 
-      const response = await fn(args);
+      const response = await fn(...args);
 
-      loading.current = false;
+      setLoading(false);
       return response;
     } catch (err) {
       if ((err as Err).status_code === 401) {
         removeUser();
       }
 
-      loading.current = false;
+      setLoading(false);
       throw err;
     }
   };
