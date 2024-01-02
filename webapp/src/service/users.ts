@@ -1,6 +1,7 @@
 import { Err, usersApi } from "@api";
-import { useMutation } from "./common";
 import { useUserStore } from "@store";
+
+import { useMutation } from "./common";
 
 export interface Message {
   ok: string | null;
