@@ -1,4 +1,4 @@
-import { Err, foldersApi } from "@api";
+import { Err, filesApi, foldersApi } from "@api";
 import { useFoldersStore } from "@store";
 
 import { useMutation, useQuery } from "./common";
@@ -33,6 +33,41 @@ export const useCreateFolder = () => {
       await execute(newFolder);
       return {
         ok: "folder created",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading,
+    execute: proxy,
+  };
+};
+
+export const useUploadFiles = () => {
+  const currentFolder = useFoldersStore((state) => state.folder);
+  const { loading, execute } = useMutation(filesApi.upload);
+
+  const proxy = async (
+    files: File[],
+    overwrite: boolean
+  ): Promise<Message> => {
+    try {
+      await execute(currentFolder, files, overwrite);
+      return {
+        ok: "files uploaded",
         error: null,
       } as Message;
     } catch (err) {

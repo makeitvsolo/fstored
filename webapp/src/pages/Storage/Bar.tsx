@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Dropzone from "react-dropzone";
 import {
   DownloadIcon,
   PlusSquareIcon,
@@ -24,6 +25,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -36,7 +38,14 @@ interface NewFolderProps {
   };
 }
 
-interface RightMenuProps extends NewFolderProps {}
+interface UploadProps {
+  upload: {
+    loading: boolean;
+    execute: (files: File[], overwrite: boolean) => Promise<Message>;
+  };
+}
+
+interface RightMenuProps extends NewFolderProps, UploadProps {}
 
 interface LeftMenuProps {}
 
@@ -124,11 +133,100 @@ const NewFolder = ({ create }: NewFolderProps) => {
   );
 };
 
-const Upload = () => {
+const Upload = ({ upload }: UploadProps) => {
+  const disclosure = useDisclosure();
+  const [files, setFiles] = useState<File[]>([]);
+  const [message, setMessage] = useState({} as Message);
+
+  const onClose = () => {
+    setMessage({} as Message);
+    setFiles([]);
+    disclosure.onClose();
+  };
+
+  const onUpload = async () => {
+    const overwrite = false;
+    const response = await upload.execute(files, overwrite);
+
+    if (response.ok) {
+      onClose();
+    }
+
+    setMessage(response);
+  };
+
+  const onOverwrite = async () => {
+    const overwrite = true;
+    const response = await upload.execute(files, overwrite);
+
+    if (response.ok) {
+      onClose();
+    }
+
+    setMessage(response);
+  };
+
   return (
-    <Button leftIcon={<DownloadIcon />}>
-      <Text fontSize="xs">Upload</Text>
-    </Button>
+    <>
+      <Button leftIcon={<DownloadIcon />} onClick={disclosure.onOpen}>
+        <Text fontSize="xs">Upload</Text>
+      </Button>
+
+      <Modal isOpen={disclosure.isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Upload files</ModalHeader>
+          <ModalBody>
+            <Box my={2}>
+              {message.error && (
+                <Alert status="error">
+                  <AlertIcon />
+                  <AlertTitle>error:</AlertTitle>
+                  <AlertDescription>{message.error}</AlertDescription>
+                </Alert>
+              )}
+              <Dropzone onDrop={(acceptedFiles) => setFiles(acceptedFiles)}>
+                {({ getRootProps, getInputProps }) => (
+                  <Box
+                    {...getRootProps()}
+                    p={4}
+                    borderWidth={1}
+                    borderRadius={4}
+                    boxShadow="lg"
+                    cursor="pointer"
+                  >
+                    <input {...getInputProps()} />
+                    <VStack spacing={1}>
+                      <Text>
+                        Drag 'n' drop some files here, or click to select files
+                      </Text>
+                      {files.length !== 0 && (
+                        <Text as="i" noOfLines={1}>
+                          selected: {files.map((file) => file.name)}
+                        </Text>
+                      )}
+                    </VStack>
+                  </Box>
+                )}
+              </Dropzone>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup colorScheme="blue" variant="ghost">
+              <Button onClick={onUpload} isLoading={upload.loading}>
+                Upload
+              </Button>
+              <Button onClick={onOverwrite} isLoading={upload.loading}>
+                Overwrite
+              </Button>
+              <Button onClick={onClose} isLoading={upload.loading}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
@@ -141,20 +239,20 @@ const LeftMenu = () => {
   );
 };
 
-const RightMenu = ({ create }: RightMenuProps) => {
+const RightMenu = ({ create, upload }: RightMenuProps) => {
   return (
     <ButtonGroup colorScheme="blue" variant="outline" size="sm" spacing={4}>
       <NewFolder create={create} />
-      <Upload />
+      <Upload upload={upload} />
     </ButtonGroup>
   );
 };
 
-export const Bar = ({ create }: BarProps) => {
+export const Bar = ({ create, upload }: BarProps) => {
   return (
     <Flex mx={4} justifyContent="space-between" alignItems="center">
       <LeftMenu />
-      <RightMenu create={create} />
+      <RightMenu create={create} upload={upload} />
     </Flex>
   );
 };

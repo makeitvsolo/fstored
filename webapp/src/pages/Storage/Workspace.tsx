@@ -49,7 +49,7 @@ const File = ({ path, size, modificationTime }: FileProps) => {
           {path}
         </Text>
         <HStack spacing={14}>
-          <Text>{modificationTime.toDateString()}</Text>
+          <Text>{modificationTime.toString()}</Text>
           <Text>{size}</Text>
         </HStack>
       </Flex>

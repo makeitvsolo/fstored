@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 
-import { useCreateFolder, useCurrentFolder } from "@service";
+import { useCreateFolder, useCurrentFolder, useUploadFiles } from "@service";
 
 import { Bar } from "./Bar";
 import { Workspace } from "./Workspace";
@@ -8,9 +8,16 @@ import { Workspace } from "./Workspace";
 export const Storage = () => {
   const currentFolder = useCurrentFolder();
   const create = useCreateFolder();
+  const upload = useUploadFiles();
 
   const onCreate = async (name: string) => {
     const response = await create.execute(name);
+    await currentFolder.refetch();
+    return response;
+  };
+
+  const onUpload = async (files: File[], overwrite: boolean) => {
+    const response = await upload.execute(files, overwrite);
     await currentFolder.refetch();
     return response;
   };
@@ -24,7 +31,10 @@ export const Storage = () => {
       borderRadius={8}
       boxShadow="lg"
     >
-      <Bar create={{ loading: create.loading, execute: onCreate }} />
+      <Bar
+        create={{ loading: create.loading, execute: onCreate }}
+        upload={{ loading: upload.loading, execute: onUpload }}
+      />
       <Workspace currentFolder={currentFolder} />
     </Box>
   );

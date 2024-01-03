@@ -60,3 +60,56 @@ export const foldersApi = {
     });
   },
 };
+
+export const filesApi = {
+  upload: async (
+    path: string,
+    files: File[],
+    overwrite: boolean
+  ): Promise<void> => {
+    const form = new FormData();
+
+    files.forEach((file) => {
+      form.append("file", file);
+    });
+
+    if (overwrite) {
+      await api.put(`/storage/files${path}`, form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } else {
+      await api.post(`/storage/files${path}`, form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+  },
+
+  move: async (source: string, destination: string): Promise<void> => {
+    await api.post(
+      `/storage/files${destination}`,
+
+      null,
+
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: { mvfrom: source },
+      }
+    );
+  },
+
+  remove: async (path: string): Promise<void> => {
+    await api.delete(`/storage/files${path}`);
+  },
+
+  download: async (path: string): Promise<void> => {
+    await api.get(`/storage/files${path}`, {
+      responseType: "blob",
+    });
+  },
+};
