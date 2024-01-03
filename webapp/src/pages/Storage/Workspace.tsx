@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 import { FolderContent } from "@api";
+import { useFoldersStore } from "@store";
 
 interface FileProps {
   path: string;
@@ -21,13 +22,6 @@ interface FileProps {
 
 interface FolderProps {
   path: string;
-}
-
-interface ResourceProps {
-  path: string;
-  resource: string;
-  size: number | null;
-  modificationTime: Date | null;
 }
 
 export interface WorkspaceProps {
@@ -58,8 +52,19 @@ const File = ({ path, size, modificationTime }: FileProps) => {
 };
 
 const Folder = ({ path }: FolderProps) => {
+  const setFolder = useFoldersStore((state) => state.setFolder);
+
   return (
-    <Button size="sm" width="full" colorScheme="blue" variant="ghost">
+    <Button
+      size="sm"
+      width="full"
+      colorScheme="blue"
+      variant="ghost"
+      onClick={() => {
+        console.log(path);
+        setFolder(path);
+      }}
+    >
       <Flex width="full" justifyContent="space-between" alignItems="center">
         <Text>
           <Icon fill="currentColor">
@@ -69,19 +74,6 @@ const Folder = ({ path }: FolderProps) => {
         </Text>
       </Flex>
     </Button>
-  );
-};
-
-const Resource = ({
-  path,
-  resource,
-  size,
-  modificationTime,
-}: ResourceProps) => {
-  return resource === "files" ? (
-    <File path={path} size={size!} modificationTime={modificationTime!} />
-  ) : (
-    <Folder path={path} />
   );
 };
 
@@ -102,15 +94,18 @@ export const Workspace = ({ currentFolder }: WorkspaceProps) => {
             <Text as="h3">There's nothing in here.</Text>
           </Box>
         ) : (
-          currentFolder.data?.children.map((child) => (
-            <Resource
-              key={child.path}
-              path={child.path}
-              resource={child.resource}
-              size={child.size}
-              modificationTime={child.modificationTime}
-            />
-          ))
+          currentFolder.data?.children.map((child) =>
+            child.resource === "files" ? (
+              <File
+                key={child.path}
+                path={child.path}
+                size={child.size!}
+                modificationTime={child.modificationTime!}
+              />
+            ) : (
+              <Folder key={child.path} path={child.path} />
+            )
+          )
         )}
       </VStack>
     </Box>
