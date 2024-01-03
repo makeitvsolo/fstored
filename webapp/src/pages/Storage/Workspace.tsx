@@ -1,5 +1,11 @@
 import { useEffect } from "react";
 import {
+  ArrowUpDownIcon,
+  DeleteIcon,
+  DownloadIcon,
+  EditIcon,
+} from "@chakra-ui/icons";
+import {
   Box,
   Spinner,
   StackDivider,
@@ -9,6 +15,11 @@ import {
   Flex,
   Icon,
   HStack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
 } from "@chakra-ui/react";
 
 import { FolderContent } from "@api";
@@ -22,79 +33,139 @@ interface FileProps {
 
 interface FolderProps {
   path: string;
+
+  open: (path: string) => Promise<void>;
 }
 
 export interface WorkspaceProps {
-  currentFolder: {
+  openFolder: {
     loading: boolean;
     data: FolderContent | null;
-    refetch: () => Promise<void>;
+    refetch: (path: string) => Promise<void>;
   };
 }
 
 const File = ({ path, size, modificationTime }: FileProps) => {
+  const toName = (path: string) => {
+    return path.split("/").reduce((_, second) => second);
+  };
+
+  const toFileSize = (bytes: number) => {
+    const k = 1024;
+    const names = [
+      "Bytes",
+      "KiB",
+      "MiB",
+      "GiB",
+      "TiB",
+      "PiB",
+      "EiB",
+      "ZiB",
+      "YiB",
+    ];
+
+    if (!+bytes) {
+      return "0 Bytes";
+    }
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${Math.floor(bytes / Math.pow(k, i))} ${names[i]}`;
+  };
+
   return (
-    <Button size="sm" width="full" colorScheme="blue" variant="ghost">
-      <Flex width="full" justifyContent="space-between" alignItems="center">
-        <Text>
-          <Icon fill="currentColor">
-            <path d="M16,2l4,4H16ZM14,2H5A1,1,0,0,0,4,3V21a1,1,0,0,0,1,1H19a1,1,0,0,0,1-1V8H14Z" />
-          </Icon>{" "}
-          {path}
-        </Text>
-        <HStack spacing={14}>
-          <Text>{modificationTime.toString()}</Text>
-          <Text>{size}</Text>
-        </HStack>
-      </Flex>
-    </Button>
+    <Menu isLazy>
+      <MenuButton
+        as={Button}
+        size="sm"
+        width="full"
+        colorScheme="blue"
+        variant="ghost"
+      >
+        <Flex width="full" justifyContent="space-between" alignItems="center">
+          <Text>
+            <Icon fill="currentColor">
+              <path d="M16,2l4,4H16ZM14,2H5A1,1,0,0,0,4,3V21a1,1,0,0,0,1,1H19a1,1,0,0,0,1-1V8H14Z" />
+            </Icon>{" "}
+            {toName(path)}
+          </Text>
+          <HStack spacing={14}>
+            <Text>{modificationTime.toString()}</Text>
+            <Text>{toFileSize(size)}</Text>
+          </HStack>
+        </Flex>
+      </MenuButton>
+
+      <MenuList>
+        <MenuItem icon={<DownloadIcon />}>Download</MenuItem>
+        <MenuDivider />
+        <MenuItem icon={<EditIcon />}>Rename</MenuItem>
+        <MenuItem icon={<DeleteIcon />}>Remove</MenuItem>
+      </MenuList>
+    </Menu>
   );
 };
 
-const Folder = ({ path }: FolderProps) => {
-  const setFolder = useFoldersStore((state) => state.setFolder);
+const Folder = ({ path, open }: FolderProps) => {
+  const toName = (path: string) => {
+    return path
+      .split("/")
+      .reduce((first, second) => (second !== "" ? second : first));
+  };
 
   return (
-    <Button
-      size="sm"
-      width="full"
-      colorScheme="blue"
-      variant="ghost"
-      onClick={() => {
-        console.log(path);
-        setFolder(path);
-      }}
-    >
-      <Flex width="full" justifyContent="space-between" alignItems="center">
-        <Text>
-          <Icon fill="currentColor">
-            <path d="M2 7c0-1.4 0-2.1.272-2.635a2.5 2.5 0 0 1 1.093-1.093C3.9 3 4.6 3 6 3h1.431c.94 0 1.409 0 1.835.13a3 3 0 0 1 1.033.552c.345.283.605.674 1.126 1.455L12 6h6c1.4 0 2.1 0 2.635.272a2.5 2.5 0 0 1 1.092 1.093C22 7.9 22 8.6 22 10v5c0 1.4 0 2.1-.273 2.635a2.5 2.5 0 0 1-1.092 1.092C20.1 19 19.4 19 18 19H6c-1.4 0-2.1 0-2.635-.273a2.5 2.5 0 0 1-1.093-1.092C2 17.1 2 16.4 2 15V7z" />
-          </Icon>{" "}
-          {path}
-        </Text>
-      </Flex>
-    </Button>
+    <Menu isLazy>
+      <MenuButton
+        as={Button}
+        size="sm"
+        width="full"
+        colorScheme="blue"
+        variant="ghost"
+      >
+        <Flex width="full" justifyContent="space-between" alignItems="center">
+          <Text>
+            <Icon fill="currentColor">
+              <path d="M2 7c0-1.4 0-2.1.272-2.635a2.5 2.5 0 0 1 1.093-1.093C3.9 3 4.6 3 6 3h1.431c.94 0 1.409 0 1.835.13a3 3 0 0 1 1.033.552c.345.283.605.674 1.126 1.455L12 6h6c1.4 0 2.1 0 2.635.272a2.5 2.5 0 0 1 1.092 1.093C22 7.9 22 8.6 22 10v5c0 1.4 0 2.1-.273 2.635a2.5 2.5 0 0 1-1.092 1.092C20.1 19 19.4 19 18 19H6c-1.4 0-2.1 0-2.635-.273a2.5 2.5 0 0 1-1.093-1.092C2 17.1 2 16.4 2 15V7z" />
+            </Icon>{" "}
+            {toName(path)}
+          </Text>
+        </Flex>
+      </MenuButton>
+
+      <MenuList>
+        <MenuItem
+          icon={<ArrowUpDownIcon />}
+          onClick={async () => await open(path)}
+        >
+          Open
+        </MenuItem>
+        <MenuDivider />
+        <MenuItem icon={<EditIcon />}>Rename</MenuItem>
+        <MenuItem icon={<DeleteIcon />}>Remove</MenuItem>
+      </MenuList>
+    </Menu>
   );
 };
 
-export const Workspace = ({ currentFolder }: WorkspaceProps) => {
+export const Workspace = ({ openFolder }: WorkspaceProps) => {
+  const folder = useFoldersStore((state) => state.folder);
+
   useEffect(() => {
-    currentFolder.refetch();
+    openFolder.refetch(folder);
   }, []);
 
   return (
     <Box my={6} h="60vh" p={2} borderWidth={1} overflowY="auto">
       <VStack divider={<StackDivider />}>
-        {currentFolder.loading ? (
+        {openFolder.loading ? (
           <Box mt={24}>
             <Spinner />
           </Box>
-        ) : currentFolder.data?.children.length === 0 ? (
+        ) : openFolder.data?.children.length === 0 ? (
           <Box mt={24}>
             <Text as="h3">There's nothing in here.</Text>
           </Box>
         ) : (
-          currentFolder.data?.children.map((child) =>
+          openFolder.data?.children.map((child) =>
             child.resource === "files" ? (
               <File
                 key={child.path}
@@ -103,7 +174,11 @@ export const Workspace = ({ currentFolder }: WorkspaceProps) => {
                 modificationTime={child.modificationTime!}
               />
             ) : (
-              <Folder key={child.path} path={child.path} />
+              <Folder
+                key={child.path}
+                path={child.path}
+                open={openFolder.refetch}
+              />
             )
           )
         )}
