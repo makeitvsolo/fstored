@@ -30,18 +30,23 @@ import {
 } from "@chakra-ui/react";
 
 import { Message } from "@service";
+import { useFoldersStore } from "@store";
 
 interface NewFolderProps {
   create: {
     loading: boolean;
-    execute: (name: string) => Promise<Message>;
+    execute: (path: string, name: string) => Promise<Message>;
   };
 }
 
 interface UploadProps {
   upload: {
     loading: boolean;
-    execute: (files: File[], overwrite: boolean) => Promise<Message>;
+    execute: (
+      path: string,
+      files: File[],
+      overwrite: boolean
+    ) => Promise<Message>;
   };
 }
 
@@ -68,6 +73,8 @@ const Search = () => {
 };
 
 const NewFolder = ({ create }: NewFolderProps) => {
+  const folder = useFoldersStore((state) => state.folder);
+
   const disclosure = useDisclosure();
   const [name, setName] = useState("");
   const [message, setMessage] = useState({} as Message);
@@ -78,7 +85,7 @@ const NewFolder = ({ create }: NewFolderProps) => {
   };
 
   const onCreate = async () => {
-    const response = await create.execute(name);
+    const response = await create.execute(folder, name);
 
     if (response.ok) {
       onClose();
@@ -134,6 +141,8 @@ const NewFolder = ({ create }: NewFolderProps) => {
 };
 
 const Upload = ({ upload }: UploadProps) => {
+  const folder = useFoldersStore((state) => state.folder);
+
   const disclosure = useDisclosure();
   const [files, setFiles] = useState<File[]>([]);
   const [message, setMessage] = useState({} as Message);
@@ -146,7 +155,7 @@ const Upload = ({ upload }: UploadProps) => {
 
   const onUpload = async () => {
     const overwrite = false;
-    const response = await upload.execute(files, overwrite);
+    const response = await upload.execute(folder, files, overwrite);
 
     if (response.ok) {
       onClose();
@@ -157,7 +166,7 @@ const Upload = ({ upload }: UploadProps) => {
 
   const onOverwrite = async () => {
     const overwrite = true;
-    const response = await upload.execute(files, overwrite);
+    const response = await upload.execute(folder, files, overwrite);
 
     if (response.ok) {
       onClose();

@@ -1,24 +1,28 @@
 import { Box } from "@chakra-ui/react";
 
-import { useCreateFolder, useCurrentFolder, useUploadFiles } from "@service";
+import { useCreateFolder, useOpenFolder, useUploadFiles } from "@service";
 
 import { Bar } from "./Bar";
 import { Workspace } from "./Workspace";
 
 export const Storage = () => {
-  const currentFolder = useCurrentFolder();
-  const create = useCreateFolder();
-  const upload = useUploadFiles();
+  const openFolder = useOpenFolder();
+  const createFolder = useCreateFolder();
+  const uploadFiles = useUploadFiles();
 
-  const onCreate = async (name: string) => {
-    const response = await create.execute(name);
-    await currentFolder.refetch();
+  const onCreateFolder = async (path: string, name: string) => {
+    const response = await createFolder.execute(path, name);
+    await openFolder.refetch(path);
     return response;
   };
 
-  const onUpload = async (files: File[], overwrite: boolean) => {
-    const response = await upload.execute(files, overwrite);
-    await currentFolder.refetch();
+  const onUploadFiles = async (
+    path: string,
+    files: File[],
+    overwrite: boolean
+  ) => {
+    const response = await uploadFiles.execute(path, files, overwrite);
+    await openFolder.refetch(path);
     return response;
   };
 
@@ -32,10 +36,10 @@ export const Storage = () => {
       boxShadow="lg"
     >
       <Bar
-        create={{ loading: create.loading, execute: onCreate }}
-        upload={{ loading: upload.loading, execute: onUpload }}
+        create={{ loading: createFolder.loading, execute: onCreateFolder }}
+        upload={{ loading: uploadFiles.loading, execute: onUploadFiles }}
       />
-      <Workspace currentFolder={currentFolder} />
+      <Workspace openFolder={openFolder} />
     </Box>
   );
 };

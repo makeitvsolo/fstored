@@ -8,12 +8,13 @@ export interface Message {
   error: string | null;
 }
 
-export const useCurrentFolder = () => {
-  const currentFolder = useFoldersStore((state) => state.folder);
+export const useOpenFolder = () => {
+  const setFolder = useFoldersStore((state) => state.setFolder);
   const { loading, data, refetch } = useQuery(foldersApi.folder);
 
-  const proxy = async () => {
-    await refetch(currentFolder);
+  const proxy = async (path: string) => {
+    setFolder(path);
+    await refetch(path);
   };
 
   return {
@@ -24,12 +25,11 @@ export const useCurrentFolder = () => {
 };
 
 export const useCreateFolder = () => {
-  const currentFolder = useFoldersStore((state) => state.folder);
   const { loading, execute } = useMutation(foldersApi.make);
 
-  const proxy = async (name: string): Promise<Message> => {
+  const proxy = async (path: string, name: string): Promise<Message> => {
     try {
-      const newFolder = currentFolder.concat(name, "/");
+      const newFolder = path.concat(name, "/");
       await execute(newFolder);
       return {
         ok: "folder created",
@@ -57,15 +57,15 @@ export const useCreateFolder = () => {
 };
 
 export const useUploadFiles = () => {
-  const currentFolder = useFoldersStore((state) => state.folder);
   const { loading, execute } = useMutation(filesApi.upload);
 
   const proxy = async (
+    path: string,
     files: File[],
     overwrite: boolean
   ): Promise<Message> => {
     try {
-      await execute(currentFolder, files, overwrite);
+      await execute(path, files, overwrite);
       return {
         ok: "files uploaded",
         error: null,
