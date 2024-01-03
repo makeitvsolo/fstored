@@ -1,12 +1,19 @@
 import { Box } from "@chakra-ui/react";
 
-import { useCurrentFolder } from "@service";
+import { useCreateFolder, useCurrentFolder } from "@service";
 
 import { Bar } from "./Bar";
 import { Workspace } from "./Workspace";
 
 export const Storage = () => {
   const currentFolder = useCurrentFolder();
+  const create = useCreateFolder();
+
+  const onCreate = async (name: string) => {
+    const response = await create.execute(name);
+    await currentFolder.refetch();
+    return response;
+  };
 
   return (
     <Box
@@ -17,7 +24,7 @@ export const Storage = () => {
       borderRadius={8}
       boxShadow="lg"
     >
-      <Bar />
+      <Bar create={{ loading: create.loading, execute: onCreate }} />
       <Workspace currentFolder={currentFolder} />
     </Box>
   );
