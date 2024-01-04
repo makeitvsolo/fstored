@@ -8,6 +8,7 @@ import {
   useRemoveFolder,
   useRenameFile,
   useRenameFolder,
+  useSearch,
   useUploadFiles,
 } from "@service";
 import { useFoldersStore } from "@store";
@@ -19,6 +20,7 @@ export const Storage = () => {
   const folder = useFoldersStore((state) => state.folder);
 
   const openFolder = useOpenFolder();
+  const search = useSearch();
   const createFolder = useCreateFolder();
   const removeFolder = useRemoveFolder();
   const renameFolder = useRenameFolder();
@@ -89,6 +91,8 @@ export const Storage = () => {
         create={{ loading: createFolder.loading, execute: onCreateFolder }}
         upload={{ loading: uploadFiles.loading, execute: onUploadFiles }}
         open={openFolder.refetch}
+        search={search}
+        download={downloadFile.fetch}
       />
       <Workspace
         openFolder={openFolder}

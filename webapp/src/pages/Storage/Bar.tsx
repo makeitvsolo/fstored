@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Dropzone from "react-dropzone";
 import {
+  ArrowUpDownIcon,
   DownloadIcon,
   PlusSquareIcon,
   SearchIcon,
@@ -20,7 +21,10 @@ import {
   Flex,
   FormControl,
   FormHelperText,
+  IconButton,
   Input,
+  InputGroup,
+  InputLeftElement,
   Modal,
   ModalBody,
   ModalContent,
@@ -34,11 +38,14 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Spinner,
+  StackDivider,
   Text,
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { MatchingResources } from "@api";
 import { Message } from "@service";
 import { useFoldersStore } from "@store";
 
@@ -64,9 +71,20 @@ interface PathProps {
   open: (path: string) => Promise<void>;
 }
 
+interface SearchProps {
+  search: {
+    loading: boolean;
+    data: MatchingResources | null;
+    refetch: (name: string) => Promise<void>;
+  };
+
+  open: (path: string) => Promise<void>;
+  download: (path: string) => Promise<void>;
+}
+
 interface RightMenuProps extends NewFolderProps, UploadProps {}
 
-interface LeftMenuProps extends PathProps {}
+interface LeftMenuProps extends PathProps, SearchProps {}
 
 export interface BarProps extends LeftMenuProps, RightMenuProps {}
 
@@ -118,11 +136,82 @@ const Path = ({ open }: PathProps) => {
   );
 };
 
-const Search = () => {
+const Search = ({ search, open, download }: SearchProps) => {
+  const disclosure = useDisclosure();
+
+  const onOpen = async (path: string) => {
+    await open(path);
+    disclosure.onClose();
+  };
+
+  const onDownload = async (path: string) => {
+    await download(path);
+    disclosure.onClose();
+  };
+
   return (
-    <Button leftIcon={<SearchIcon />}>
-      <Text fontSize="xs">Search</Text>
-    </Button>
+    <>
+      <Button leftIcon={<SearchIcon />} onClick={disclosure.onOpen}>
+        <Text fontSize="xs">Search</Text>
+      </Button>
+
+      <Modal isOpen={disclosure.isOpen} onClose={disclosure.onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <VStack my={2}>
+              <Text>Search</Text>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon />
+                </InputLeftElement>
+                <Input
+                  placeholder="resource name"
+                  onChange={async (e) => await search.refetch(e.target.value)}
+                />
+              </InputGroup>
+            </VStack>
+          </ModalHeader>
+          <ModalBody>
+            <VStack divider={<StackDivider />}>
+              {search.loading ? (
+                <Box>
+                  <Spinner />
+                </Box>
+              ) : search.data?.objects.length === 0 ? (
+                <Box>
+                  <Text as="h3">Nothing was found.</Text>
+                </Box>
+              ) : (
+                search.data?.objects.map((obj) => (
+                  <Flex
+                    key={obj.path}
+                    width="full"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Text>{obj.path}</Text>
+                    {obj.resource === "files" ? (
+                      <IconButton
+                        aria-label="download file"
+                        icon={<DownloadIcon />}
+                        onClick={async () => await onDownload(obj.path)}
+                      />
+                    ) : (
+                      <IconButton
+                        aria-label="open folder"
+                        icon={<ArrowUpDownIcon />}
+                        onClick={async () => await onOpen(obj.path)}
+                      />
+                    )}
+                  </Flex>
+                ))
+              )}
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
@@ -293,11 +382,11 @@ const Upload = ({ upload }: UploadProps) => {
   );
 };
 
-const LeftMenu = ({ open }: LeftMenuProps) => {
+const LeftMenu = ({ open, search, download }: LeftMenuProps) => {
   return (
     <ButtonGroup colorScheme="blue" variant="outline" size="sm" spacing={4}>
       <Path open={open} />
-      <Search />
+      <Search search={search} open={open} download={download} />
     </ButtonGroup>
   );
 };
@@ -311,10 +400,10 @@ const RightMenu = ({ create, upload }: RightMenuProps) => {
   );
 };
 
-export const Bar = ({ create, upload, open }: BarProps) => {
+export const Bar = ({ create, upload, open, search, download }: BarProps) => {
   return (
     <Flex mx={4} justifyContent="space-between" alignItems="center">
-      <LeftMenu open={open} />
+      <LeftMenu open={open} search={search} download={download} />
       <RightMenu create={create} upload={upload} />
     </Flex>
   );

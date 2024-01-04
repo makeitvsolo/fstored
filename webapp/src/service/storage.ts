@@ -24,6 +24,16 @@ export const useOpenFolder = () => {
   };
 };
 
+export const useSearch = () => {
+  const { loading, data, refetch } = useQuery(foldersApi.search);
+
+  return {
+    loading,
+    data,
+    refetch,
+  };
+};
+
 export const useCreateFolder = () => {
   const { loading, execute } = useMutation(foldersApi.make);
 
@@ -219,9 +229,7 @@ export const useRenameFile = () => {
 
   const proxy = async (path: string, name: string): Promise<Message> => {
     try {
-      const oldName = path
-        .split("/")
-        .reduce((_, second) => second);
+      const oldName = path.split("/").reduce((_, second) => second);
 
       const destination = [...path.split("/"), name]
         .filter((part) => part !== oldName && part !== "")
