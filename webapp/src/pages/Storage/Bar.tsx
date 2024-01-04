@@ -12,6 +12,9 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
   ButtonGroup,
   Flex,
@@ -24,6 +27,13 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Text,
   VStack,
   useDisclosure,
@@ -50,17 +60,61 @@ interface UploadProps {
   };
 }
 
+interface PathProps {
+  open: (path: string) => Promise<void>;
+}
+
 interface RightMenuProps extends NewFolderProps, UploadProps {}
 
-interface LeftMenuProps {}
+interface LeftMenuProps extends PathProps {}
 
 export interface BarProps extends LeftMenuProps, RightMenuProps {}
 
-const Path = () => {
+const Path = ({ open }: PathProps) => {
+  const folder = useFoldersStore((state) => state.folder);
+  const parts = `Home${folder}`.split("/").filter((part) => part);
+
+  const toName = (parts: string[]) => {
+    return parts[parts.length - 1];
+  };
+
+  const onOpen = async (partIdx: number) => {
+    const path =
+      partIdx === 0
+        ? "/"
+        : `/${parts
+            .slice(0, partIdx + 1)
+            .filter((part) => part !== "Home")
+            .join("/")}/`;
+
+    console.log(path);
+    await open(path);
+  };
+
   return (
-    <Button leftIcon={<ViewIcon />}>
-      <Text fontSize="xs">Path</Text>
-    </Button>
+    <Popover>
+      <PopoverTrigger>
+        <Button leftIcon={<ViewIcon />}>
+          <Text fontSize="xs">{toName(parts)}</Text>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverArrow />
+        <PopoverCloseButton />
+        <PopoverHeader>Current path</PopoverHeader>
+        <PopoverBody>
+          <Breadcrumb>
+            {parts.map((part, idx) => (
+              <BreadcrumbItem key={part}>
+                <BreadcrumbLink onClick={async () => await onOpen(idx)}>
+                  {part}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            ))}
+          </Breadcrumb>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
   );
 };
 
@@ -239,10 +293,10 @@ const Upload = ({ upload }: UploadProps) => {
   );
 };
 
-const LeftMenu = () => {
+const LeftMenu = ({ open }: LeftMenuProps) => {
   return (
     <ButtonGroup colorScheme="blue" variant="outline" size="sm" spacing={4}>
-      <Path />
+      <Path open={open} />
       <Search />
     </ButtonGroup>
   );
@@ -257,10 +311,10 @@ const RightMenu = ({ create, upload }: RightMenuProps) => {
   );
 };
 
-export const Bar = ({ create, upload }: BarProps) => {
+export const Bar = ({ create, upload, open }: BarProps) => {
   return (
     <Flex mx={4} justifyContent="space-between" alignItems="center">
-      <LeftMenu />
+      <LeftMenu open={open} />
       <RightMenu create={create} upload={upload} />
     </Flex>
   );

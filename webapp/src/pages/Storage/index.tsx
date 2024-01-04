@@ -88,6 +88,7 @@ export const Storage = () => {
       <Bar
         create={{ loading: createFolder.loading, execute: onCreateFolder }}
         upload={{ loading: uploadFiles.loading, execute: onUploadFiles }}
+        open={openFolder.refetch}
       />
       <Workspace
         openFolder={openFolder}
