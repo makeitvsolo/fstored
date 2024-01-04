@@ -7,13 +7,13 @@ COPY buildSrc ./buildSrc
 COPY boot ./boot
 COPY internal ./internal
 
-RUN gradle clean build --no-daemon -x test -x check
+RUN gradle shadowJar --no-daemon -x test -x check
 
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /
 
-COPY --from=build /rest-api/build/libs/*.jar fstored-rest-api.jar
+COPY --from=build /rest-api/boot/build/libs/*.jar fstored-api.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "fstored-rest-api.jar"]
+ENTRYPOINT ["java", "-jar", "fstored-api.jar"]

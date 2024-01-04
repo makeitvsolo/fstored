@@ -1,4 +1,12 @@
+plugins {
+    id 'application'
+}
+
 group = 'github.makeitvsolo.fstored.boot'
+
+application {
+    mainClassName = 'github.makeitvsolo.fstored.boot.FstoredApplication'
+}
 
 dependencies {
     implementation project(':internal:core')
