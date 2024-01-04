@@ -7,5 +7,8 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return defineConfig({
     plugins: [react(), tsconfigPaths()],
+    preview: {
+      port: 3000,
+    },
   });
 };
