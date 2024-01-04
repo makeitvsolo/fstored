@@ -63,7 +63,7 @@ export const useRemoveFolder = () => {
     try {
       await execute(path);
       return {
-        ok: "folder created",
+        ok: "folder removed",
         error: null,
       } as Message;
     } catch (err) {
@@ -190,7 +190,46 @@ export const useRemoveFile = () => {
     try {
       await execute(path);
       return {
-        ok: "folder created",
+        ok: "file removed",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading,
+    execute: proxy,
+  };
+};
+
+export const useRenameFile = () => {
+  const { loading, execute } = useMutation(filesApi.move);
+
+  const proxy = async (path: string, name: string): Promise<Message> => {
+    try {
+      const oldName = path
+        .split("/")
+        .reduce((_, second) => second);
+
+      const destination = [...path.split("/"), name]
+        .filter((part) => part !== oldName && part !== "")
+        .join("/");
+
+      await execute(path, `/${destination}`);
+      return {
+        ok: "file renamed",
         error: null,
       } as Message;
     } catch (err) {

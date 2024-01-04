@@ -48,6 +48,10 @@ interface FileProps {
 
   download: (path: string) => Promise<void>;
   remove: (path: string) => Promise<Message>;
+  rename: {
+    loading: boolean;
+    execute: (path: string, name: string) => Promise<Message>;
+  };
 }
 
 interface FolderProps {
@@ -79,6 +83,10 @@ export interface WorkspaceProps {
   downloadFile: {
     fetch: (path: string) => Promise<void>;
   };
+  renameFile: {
+    loading: boolean;
+    execute: (path: string, name: string) => Promise<Message>;
+  };
   removeFile: {
     loading: boolean;
     execute: (path: string) => Promise<Message>;
@@ -91,7 +99,12 @@ const File = ({
   modificationTime,
   download,
   remove,
+  rename,
 }: FileProps) => {
+  const disclosure = useDisclosure();
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState({} as Message);
+
   const toName = (path: string) => {
     return path.split("/").reduce((_, second) => second);
   };
@@ -118,46 +131,100 @@ const File = ({
     return `${Math.floor(bytes / Math.pow(k, i))} ${names[i]}`;
   };
 
-  return (
-    <Menu isLazy>
-      <MenuButton
-        as={Button}
-        size="sm"
-        width="full"
-        colorScheme="blue"
-        variant="ghost"
-      >
-        <Flex width="full" justifyContent="space-between" alignItems="center">
-          <Text>
-            <Icon fill="currentColor">
-              <path d="M16,2l4,4H16ZM14,2H5A1,1,0,0,0,4,3V21a1,1,0,0,0,1,1H19a1,1,0,0,0,1-1V8H14Z" />
-            </Icon>{" "}
-            {toName(path)}
-          </Text>
-          <HStack spacing={14}>
-            <Text>{modificationTime.toString()}</Text>
-            <Text>{toFileSize(size)}</Text>
-          </HStack>
-        </Flex>
-      </MenuButton>
+  const onClose = () => {
+    setMessage({} as Message);
+    disclosure.onClose();
+  };
 
-      <MenuList>
-        <MenuItem
-          onClick={async () => await download(path)}
-          icon={<DownloadIcon />}
+  const onRename = async () => {
+    const response = await rename.execute(path, name);
+
+    if (response.ok) {
+      onClose();
+    }
+
+    setMessage(response);
+  };
+
+  return (
+    <>
+      <Menu isLazy>
+        <MenuButton
+          as={Button}
+          size="sm"
+          width="full"
+          colorScheme="blue"
+          variant="ghost"
         >
-          Download
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem icon={<EditIcon />}>Rename</MenuItem>
-        <MenuItem
-          onClick={async () => await remove(path)}
-          icon={<DeleteIcon />}
-        >
-          Remove
-        </MenuItem>
-      </MenuList>
-    </Menu>
+          <Flex width="full" justifyContent="space-between" alignItems="center">
+            <Text>
+              <Icon fill="currentColor">
+                <path d="M16,2l4,4H16ZM14,2H5A1,1,0,0,0,4,3V21a1,1,0,0,0,1,1H19a1,1,0,0,0,1-1V8H14Z" />
+              </Icon>{" "}
+              {toName(path)}
+            </Text>
+            <HStack spacing={14}>
+              <Text>{modificationTime.toString()}</Text>
+              <Text>{toFileSize(size)}</Text>
+            </HStack>
+          </Flex>
+        </MenuButton>
+
+        <MenuList>
+          <MenuItem
+            onClick={async () => await download(path)}
+            icon={<DownloadIcon />}
+          >
+            Download
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem onClick={disclosure.onOpen} icon={<EditIcon />}>Rename</MenuItem>
+          <MenuItem
+            onClick={async () => await remove(path)}
+            icon={<DeleteIcon />}
+          >
+            Remove
+          </MenuItem>
+        </MenuList>
+      </Menu>
+
+      <Modal isOpen={disclosure.isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Rename</ModalHeader>
+          <ModalBody>
+            <Box my={2}>
+              {message.error && (
+                <Alert status="error">
+                  <AlertIcon />
+                  <AlertTitle>error:</AlertTitle>
+                  <AlertDescription>{message.error}</AlertDescription>
+                </Alert>
+              )}
+              <FormControl>
+                <Input
+                  placeholder="file name"
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <FormHelperText>
+                  Only letters, numbers or symbols '.-_'
+                </FormHelperText>
+              </FormControl>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup colorScheme="blue" variant="ghost">
+              <Button onClick={onRename} isLoading={rename.loading}>
+                Rename
+              </Button>
+              <Button onClick={onClose} isLoading={rename.loading}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
@@ -273,6 +340,7 @@ export const Workspace = ({
   renameFolder,
   downloadFile,
   removeFile,
+  renameFile
 }: WorkspaceProps) => {
   const folder = useFoldersStore((state) => state.folder);
 
@@ -301,6 +369,7 @@ export const Workspace = ({
                 modificationTime={child.modificationTime!}
                 download={downloadFile.fetch}
                 remove={removeFile.execute}
+                rename={renameFile}
               />
             ) : (
               <Folder

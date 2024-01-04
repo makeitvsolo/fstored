@@ -6,6 +6,7 @@ import {
   useOpenFolder,
   useRemoveFile,
   useRemoveFolder,
+  useRenameFile,
   useRenameFolder,
   useUploadFiles,
 } from "@service";
@@ -25,6 +26,7 @@ export const Storage = () => {
   const uploadFiles = useUploadFiles();
   const downloadFile = useDownloadFile();
   const removeFile = useRemoveFile();
+  const renameFile = useRenameFile();
 
   const onCreateFolder = async (path: string, name: string) => {
     const response = await createFolder.execute(path, name);
@@ -40,6 +42,16 @@ export const Storage = () => {
 
   const onRenameFolder = async (path: string, name: string) => {
     const response = await renameFolder.execute(path, name);
+
+    if (response.ok) {
+      await openFolder.refetch(folder);
+    }
+
+    return response;
+  };
+
+  const onRenameFile = async (path: string, name: string) => {
+    const response = await renameFile.execute(path, name);
 
     if (response.ok) {
       await openFolder.refetch(folder);
@@ -89,6 +101,10 @@ export const Storage = () => {
         }}
         downloadFile={downloadFile}
         removeFile={{ loading: removeFile.loading, execute: onRemoveFile }}
+        renameFile={{
+          loading: renameFile.loading,
+          execute: onRenameFile,
+        }}
       />
     </Box>
   );
