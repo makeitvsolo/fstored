@@ -2,6 +2,17 @@ import static github.makeitvsolo.fstored.workspace.CheckstyleConfig.*
 
 plugins {
     id 'java'
+    id 'application'
+}
+
+application {
+    mainClassName = 'github.makeitvsolo.fstored.boot.FstoredApplication'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'github.makeitvsolo.fstored.boot.FstoredApplication'
+    }
 }
 
 allprojects {
