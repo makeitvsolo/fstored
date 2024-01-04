@@ -5,6 +5,6 @@ import github.makeitvsolo.fstored.storage.application.exception.FstoredStorageAp
 public final class WrongFolderHandleException extends FstoredStorageApplicationException {
 
     public WrongFolderHandleException(final Throwable throwable) {
-        super(throwable);
+        super(throwable.getMessage());
     }
 }
