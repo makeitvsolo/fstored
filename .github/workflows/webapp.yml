@@ -1,0 +1,27 @@
+name: Webapp
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "**" ]
+
+defaults:
+  run:
+    working-directory: ./webapp
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+      
+      - name: Execute bun install
+        run: bun install
+
+      - name: Execute vite build
+        run: bunx --bun vite build

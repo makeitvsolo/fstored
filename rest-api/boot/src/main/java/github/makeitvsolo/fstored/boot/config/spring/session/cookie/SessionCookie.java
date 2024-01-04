@@ -14,6 +14,7 @@ public class SessionCookie {
 
     public static ResponseCookie from(final String token, final LocalDateTime expiresAt) {
         return ResponseCookie.from(SessionCookie.TOKEN_ID, token)
+                .path("/api/v1")
                 .sameSite(STRICT_SAME_SITE)
                 .httpOnly(true)
                 .maxAge(Duration.between(expiresAt, LocalDateTime.now()))
@@ -23,6 +24,7 @@ public class SessionCookie {
     public static ResponseCookie remove() {
         return ResponseCookie.from(SessionCookie.TOKEN_ID, "")
                 .sameSite(STRICT_SAME_SITE)
+                .path("/api/v1")
                 .httpOnly(true)
                 .maxAge(ZERO_AGE)
                 .build();
