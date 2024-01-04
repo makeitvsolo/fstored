@@ -90,3 +90,25 @@ export const useUploadFiles = () => {
     execute: proxy,
   };
 };
+
+export const useDownloadFile = () => {
+  const download = async (path: string) => {
+    try {
+      const filename = path.split("/").reduce((_, second) => second);
+      const blob = await filesApi.download(path);
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return {
+    fetch: download,
+  };
+};

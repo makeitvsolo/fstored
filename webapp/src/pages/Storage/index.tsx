@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 
-import { useCreateFolder, useOpenFolder, useUploadFiles } from "@service";
+import { useCreateFolder, useDownloadFile, useOpenFolder, useUploadFiles } from "@service";
 
 import { Bar } from "./Bar";
 import { Workspace } from "./Workspace";
@@ -9,6 +9,7 @@ export const Storage = () => {
   const openFolder = useOpenFolder();
   const createFolder = useCreateFolder();
   const uploadFiles = useUploadFiles();
+  const downloadFile = useDownloadFile();
 
   const onCreateFolder = async (path: string, name: string) => {
     const response = await createFolder.execute(path, name);
@@ -39,7 +40,7 @@ export const Storage = () => {
         create={{ loading: createFolder.loading, execute: onCreateFolder }}
         upload={{ loading: uploadFiles.loading, execute: onUploadFiles }}
       />
-      <Workspace openFolder={openFolder} />
+      <Workspace openFolder={openFolder} downloadFile={downloadFile} />
     </Box>
   );
 };

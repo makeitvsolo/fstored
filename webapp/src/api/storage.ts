@@ -1,4 +1,6 @@
-import { api } from "./axios";
+import axios from "axios";
+
+import { API_URL, api } from "./axios";
 
 export type MetaData = {
   path: string;
@@ -107,9 +109,13 @@ export const filesApi = {
     await api.delete(`/storage/files${path}`);
   },
 
-  download: async (path: string): Promise<void> => {
-    await api.get(`/storage/files${path}`, {
-      responseType: "blob",
-    });
+  download: async (path: string): Promise<Blob> => {
+    return await axios
+      .get(`/storage/files${path}`, {
+        baseURL: API_URL,
+        withCredentials: true,
+        responseType: "blob",
+      })
+      .then((response) => response.data);
   },
 };

@@ -29,6 +29,8 @@ interface FileProps {
   path: string;
   size: number;
   modificationTime: Date;
+
+  download: (path: string) => Promise<void>;
 }
 
 interface FolderProps {
@@ -43,9 +45,13 @@ export interface WorkspaceProps {
     data: FolderContent | null;
     refetch: (path: string) => Promise<void>;
   };
+
+  downloadFile: {
+    fetch: (path: string) => Promise<void>;
+  };
 }
 
-const File = ({ path, size, modificationTime }: FileProps) => {
+const File = ({ path, size, modificationTime, download }: FileProps) => {
   const toName = (path: string) => {
     return path.split("/").reduce((_, second) => second);
   };
@@ -96,7 +102,12 @@ const File = ({ path, size, modificationTime }: FileProps) => {
       </MenuButton>
 
       <MenuList>
-        <MenuItem icon={<DownloadIcon />}>Download</MenuItem>
+        <MenuItem
+          onClick={async () => await download(path)}
+          icon={<DownloadIcon />}
+        >
+          Download
+        </MenuItem>
         <MenuDivider />
         <MenuItem icon={<EditIcon />}>Rename</MenuItem>
         <MenuItem icon={<DeleteIcon />}>Remove</MenuItem>
@@ -146,7 +157,7 @@ const Folder = ({ path, open }: FolderProps) => {
   );
 };
 
-export const Workspace = ({ openFolder }: WorkspaceProps) => {
+export const Workspace = ({ openFolder, downloadFile }: WorkspaceProps) => {
   const folder = useFoldersStore((state) => state.folder);
 
   useEffect(() => {
@@ -172,6 +183,7 @@ export const Workspace = ({ openFolder }: WorkspaceProps) => {
                 path={child.path}
                 size={child.size!}
                 modificationTime={child.modificationTime!}
+                download={downloadFile.fetch}
               />
             ) : (
               <Folder
