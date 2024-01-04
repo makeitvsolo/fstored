@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpDownIcon,
   DeleteIcon,
@@ -20,6 +20,21 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  FormControl,
+  FormHelperText,
+  Input,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  ModalFooter,
+  ButtonGroup,
 } from "@chakra-ui/react";
 
 import { FolderContent } from "@api";
@@ -40,6 +55,10 @@ interface FolderProps {
 
   open: (path: string) => Promise<void>;
   remove: (path: string) => Promise<Message>;
+  rename: {
+    loading: boolean;
+    execute: (path: string, name: string) => Promise<Message>;
+  };
 }
 
 export interface WorkspaceProps {
@@ -47,6 +66,10 @@ export interface WorkspaceProps {
     loading: boolean;
     data: FolderContent | null;
     refetch: (path: string) => Promise<void>;
+  };
+  renameFolder: {
+    loading: boolean;
+    execute: (path: string, name: string) => Promise<Message>;
   };
   removeFolder: {
     loading: boolean;
@@ -138,55 +161,116 @@ const File = ({
   );
 };
 
-const Folder = ({ path, open, remove }: FolderProps) => {
+const Folder = ({ path, open, remove, rename }: FolderProps) => {
+  const disclosure = useDisclosure();
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState({} as Message);
+
   const toName = (path: string) => {
     return path
       .split("/")
       .reduce((first, second) => (second !== "" ? second : first));
   };
 
-  return (
-    <Menu isLazy>
-      <MenuButton
-        as={Button}
-        size="sm"
-        width="full"
-        colorScheme="blue"
-        variant="ghost"
-      >
-        <Flex width="full" justifyContent="space-between" alignItems="center">
-          <Text>
-            <Icon fill="currentColor">
-              <path d="M2 7c0-1.4 0-2.1.272-2.635a2.5 2.5 0 0 1 1.093-1.093C3.9 3 4.6 3 6 3h1.431c.94 0 1.409 0 1.835.13a3 3 0 0 1 1.033.552c.345.283.605.674 1.126 1.455L12 6h6c1.4 0 2.1 0 2.635.272a2.5 2.5 0 0 1 1.092 1.093C22 7.9 22 8.6 22 10v5c0 1.4 0 2.1-.273 2.635a2.5 2.5 0 0 1-1.092 1.092C20.1 19 19.4 19 18 19H6c-1.4 0-2.1 0-2.635-.273a2.5 2.5 0 0 1-1.093-1.092C2 17.1 2 16.4 2 15V7z" />
-            </Icon>{" "}
-            {toName(path)}
-          </Text>
-        </Flex>
-      </MenuButton>
+  const onClose = () => {
+    setMessage({} as Message);
+    disclosure.onClose();
+  };
 
-      <MenuList>
-        <MenuItem
-          icon={<ArrowUpDownIcon />}
-          onClick={async () => await open(path)}
+  const onRename = async () => {
+    const response = await rename.execute(path, name);
+
+    if (response.ok) {
+      onClose();
+    }
+
+    setMessage(response);
+  };
+
+  return (
+    <>
+      <Menu isLazy>
+        <MenuButton
+          as={Button}
+          size="sm"
+          width="full"
+          colorScheme="blue"
+          variant="ghost"
         >
-          Open
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem icon={<EditIcon />}>Rename</MenuItem>
-        <MenuItem
-          onClick={async () => await remove(path)}
-          icon={<DeleteIcon />}
-        >
-          Remove
-        </MenuItem>
-      </MenuList>
-    </Menu>
+          <Flex width="full" justifyContent="space-between" alignItems="center">
+            <Text>
+              <Icon fill="currentColor">
+                <path d="M2 7c0-1.4 0-2.1.272-2.635a2.5 2.5 0 0 1 1.093-1.093C3.9 3 4.6 3 6 3h1.431c.94 0 1.409 0 1.835.13a3 3 0 0 1 1.033.552c.345.283.605.674 1.126 1.455L12 6h6c1.4 0 2.1 0 2.635.272a2.5 2.5 0 0 1 1.092 1.093C22 7.9 22 8.6 22 10v5c0 1.4 0 2.1-.273 2.635a2.5 2.5 0 0 1-1.092 1.092C20.1 19 19.4 19 18 19H6c-1.4 0-2.1 0-2.635-.273a2.5 2.5 0 0 1-1.093-1.092C2 17.1 2 16.4 2 15V7z" />
+              </Icon>{" "}
+              {toName(path)}
+            </Text>
+          </Flex>
+        </MenuButton>
+
+        <MenuList>
+          <MenuItem
+            icon={<ArrowUpDownIcon />}
+            onClick={async () => await open(path)}
+          >
+            Open
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem onClick={disclosure.onOpen} icon={<EditIcon />}>
+            Rename
+          </MenuItem>
+          <MenuItem
+            onClick={async () => await remove(path)}
+            icon={<DeleteIcon />}
+          >
+            Remove
+          </MenuItem>
+        </MenuList>
+      </Menu>
+
+      <Modal isOpen={disclosure.isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Rename</ModalHeader>
+          <ModalBody>
+            <Box my={2}>
+              {message.error && (
+                <Alert status="error">
+                  <AlertIcon />
+                  <AlertTitle>error:</AlertTitle>
+                  <AlertDescription>{message.error}</AlertDescription>
+                </Alert>
+              )}
+              <FormControl>
+                <Input
+                  placeholder="folder name"
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <FormHelperText>
+                  Only letters, numbers or symbols '.-_'
+                </FormHelperText>
+              </FormControl>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup colorScheme="blue" variant="ghost">
+              <Button onClick={onRename} isLoading={rename.loading}>
+                Rename
+              </Button>
+              <Button onClick={onClose} isLoading={rename.loading}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
 export const Workspace = ({
   openFolder,
   removeFolder,
+  renameFolder,
   downloadFile,
   removeFile,
 }: WorkspaceProps) => {
@@ -224,6 +308,7 @@ export const Workspace = ({
                 path={child.path}
                 open={openFolder.refetch}
                 remove={removeFolder.execute}
+                rename={renameFolder}
               />
             )
           )

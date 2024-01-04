@@ -85,7 +85,46 @@ export const useRemoveFolder = () => {
     loading,
     execute: proxy,
   };
-}
+};
+
+export const useRenameFolder = () => {
+  const { loading, execute } = useMutation(foldersApi.move);
+
+  const proxy = async (path: string, name: string): Promise<Message> => {
+    try {
+      const oldName = path
+        .split("/")
+        .reduce((first, second) => (second !== "" ? second : first));
+
+      const destination = [...path.split("/"), name]
+        .filter((part) => part !== oldName && part !== "")
+        .join("/");
+
+      await execute(path, `/${destination}/`);
+      return {
+        ok: "folder renamed",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading,
+    execute: proxy,
+  };
+};
 
 export const useUploadFiles = () => {
   const { loading, execute } = useMutation(filesApi.upload);
@@ -173,4 +212,4 @@ export const useRemoveFile = () => {
     loading,
     execute: proxy,
   };
-}
+};
