@@ -5,6 +5,8 @@ import github.makeitvsolo.fstored.boot.config.spring.session.cookie.SessionCooki
 import github.makeitvsolo.fstored.boot.config.spring.session.exception.MissingSessionException;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.exception.SessionAlreadyExpiredException;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.exception.SessionDoesNotExistsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,8 @@ import org.springframework.web.multipart.MultipartException;
 
 @RestControllerAdvice
 public class WebExceptionHandling {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebExceptionHandling.class);
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
@@ -75,6 +79,7 @@ public class WebExceptionHandling {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> otherwise(final Throwable ex) {
+        LOG.error(String.format("internal error occurs: %s", ex.getMessage()));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorMessage.from(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error"));
     }

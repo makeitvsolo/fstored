@@ -13,6 +13,8 @@ import github.makeitvsolo.fstored.storage.application.usecase.file.dto.MoveFileD
 import github.makeitvsolo.fstored.storage.application.usecase.file.dto.WriteMultipleFileDto;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.dto.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,8 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("api/v1/storage/files")
 public class FileController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FileController.class);
 
     private final WriteFileUsecase<?> writeFileUsecase;
     private final MoveFileUsecase<?> moveFileUsecase;
@@ -62,19 +66,21 @@ public class FileController {
         var path = extractPathFrom(request.getRequestURI());
 
         if (movedFrom != null) {
+            LOG.info("trying to move file...");
             var payload = new MoveFileDto(activeUser.id(), movedFrom, path);
-
             moveFileUsecase.invoke(payload);
 
+            LOG.info("file successfully moved");
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(OkMessage.from(HttpStatus.CREATED));
         }
 
         if (files != null) {
+            LOG.info("trying to upload files...");
             var overwrite = false;
-
             uploadFiles(activeUser, path, files, overwrite);
 
+            LOG.info("files successfully uploaded");
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(OkMessage.from(HttpStatus.CREATED));
         }
@@ -90,10 +96,12 @@ public class FileController {
             @RequestPart(name = "file") final MultipartFile[] files
     ) throws IOException {
         var path = extractPathFrom(request.getRequestURI());
-        var overwrite = true;
 
+        LOG.info("trying to overwrite files...");
+        var overwrite = true;
         uploadFiles(activeUser, path, files, overwrite);
 
+        LOG.info("files successfully overwritten");
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
@@ -104,10 +112,12 @@ public class FileController {
             @Authenticated final UserDto activeUser
     ) {
         var path = extractPathFrom(request.getRequestURI());
-        var payload = new FileDto(activeUser.id(), path);
 
+        LOG.info("trying to remove file...");
+        var payload = new FileDto(activeUser.id(), path);
         removeFileUsecase.invoke(payload);
 
+        LOG.info("file successfully removed");
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
     }
@@ -118,10 +128,12 @@ public class FileController {
             @Authenticated final UserDto activeUser
     ) {
         var path = extractPathFrom(request.getRequestURI());
-        var payload = new FileDto(activeUser.id(), path);
 
+        LOG.info("trying to download file...");
+        var payload = new FileDto(activeUser.id(), path);
         var file = fetchFileUsecase.invoke(payload);
 
+        LOG.info("sending file...");
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(

@@ -12,6 +12,8 @@ import github.makeitvsolo.fstored.user.access.application.usecase.access.SignUpU
 import github.makeitvsolo.fstored.user.access.application.usecase.access.dto.UserCredentialsDto;
 import github.makeitvsolo.fstored.user.access.application.usecase.access.dto.UserDto;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/user-access")
 public class UserAccessController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserAccessController.class);
 
     private final SignUpUserUsecase signUpUserUsecase;
     private final SignInUserUsecase<?> signInUserUsecase;
@@ -46,12 +50,14 @@ public class UserAccessController {
     public ResponseEntity<?> signUp(
             @Valid @RequestBody final UserCredentialsRequest credentials
     ) {
+        LOG.info("trying to register new user...");
         var payload = new UserCredentialsDto(credentials.name(), credentials.password());
-
         var user = signUpUserUsecase.invoke(payload);
 
+        LOG.info("trying to mount root folder for new user...");
         mountRootFolderUsecase.invoke(user.id());
 
+        LOG.info("user successfully registered");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(OkMessage.from(HttpStatus.CREATED));
     }
@@ -60,12 +66,14 @@ public class UserAccessController {
     public ResponseEntity<?> signIn(
             @Valid @RequestBody final UserCredentialsRequest credentials
     ) {
+        LOG.info("trying to authorize user...");
         var payload = new UserCredentialsDto(credentials.name(), credentials.password());
-
         var access = signInUserUsecase.invoke(payload);
 
+        LOG.info("sending session cookie for authorized user...");
         var cookie = SessionCookie.from(access.token(), access.expiresAt());
 
+        LOG.info("user successfully authorized");
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(OkMessage.from(HttpStatus.OK, access));
@@ -73,10 +81,13 @@ public class UserAccessController {
 
     @PostMapping(value = "/sign-out", consumes = "application/json")
     public ResponseEntity<?> signOut(@SessionToken final String token) {
+        LOG.info("trying to remove user session...");
         signOutUserUsecase.invoke(token);
 
+        LOG.info("sending remove cookie for user...");
         var removeCookie = SessionCookie.remove();
 
+        LOG.info("session successfully removed");
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, removeCookie.toString())
                 .body(OkMessage.from(HttpStatus.NO_CONTENT));
