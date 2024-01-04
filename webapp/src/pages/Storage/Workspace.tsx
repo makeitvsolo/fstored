@@ -24,6 +24,7 @@ import {
 
 import { FolderContent } from "@api";
 import { useFoldersStore } from "@store";
+import { Message } from "@service";
 
 interface FileProps {
   path: string;
@@ -37,6 +38,7 @@ interface FolderProps {
   path: string;
 
   open: (path: string) => Promise<void>;
+  remove: (path: string) => Promise<Message>;
 }
 
 export interface WorkspaceProps {
@@ -44,6 +46,10 @@ export interface WorkspaceProps {
     loading: boolean;
     data: FolderContent | null;
     refetch: (path: string) => Promise<void>;
+  };
+  removeFolder: {
+    loading: boolean;
+    execute: (path: string) => Promise<Message>;
   };
 
   downloadFile: {
@@ -116,7 +122,7 @@ const File = ({ path, size, modificationTime, download }: FileProps) => {
   );
 };
 
-const Folder = ({ path, open }: FolderProps) => {
+const Folder = ({ path, open, remove }: FolderProps) => {
   const toName = (path: string) => {
     return path
       .split("/")
@@ -151,13 +157,22 @@ const Folder = ({ path, open }: FolderProps) => {
         </MenuItem>
         <MenuDivider />
         <MenuItem icon={<EditIcon />}>Rename</MenuItem>
-        <MenuItem icon={<DeleteIcon />}>Remove</MenuItem>
+        <MenuItem
+          onClick={async () => await remove(path)}
+          icon={<DeleteIcon />}
+        >
+          Remove
+        </MenuItem>
       </MenuList>
     </Menu>
   );
 };
 
-export const Workspace = ({ openFolder, downloadFile }: WorkspaceProps) => {
+export const Workspace = ({
+  openFolder,
+  removeFolder,
+  downloadFile,
+}: WorkspaceProps) => {
   const folder = useFoldersStore((state) => state.folder);
 
   useEffect(() => {
@@ -190,6 +205,7 @@ export const Workspace = ({ openFolder, downloadFile }: WorkspaceProps) => {
                 key={child.path}
                 path={child.path}
                 open={openFolder.refetch}
+                remove={removeFolder.execute}
               />
             )
           )

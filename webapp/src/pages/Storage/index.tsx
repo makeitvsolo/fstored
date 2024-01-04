@@ -1,13 +1,23 @@
 import { Box } from "@chakra-ui/react";
 
-import { useCreateFolder, useDownloadFile, useOpenFolder, useUploadFiles } from "@service";
+import {
+  useCreateFolder,
+  useDownloadFile,
+  useOpenFolder,
+  useRemoveFolder,
+  useUploadFiles,
+} from "@service";
+import { useFoldersStore } from "@store";
 
 import { Bar } from "./Bar";
 import { Workspace } from "./Workspace";
 
 export const Storage = () => {
+  const folder = useFoldersStore((state) => state.folder);
+
   const openFolder = useOpenFolder();
   const createFolder = useCreateFolder();
+  const removeFolder = useRemoveFolder();
   const uploadFiles = useUploadFiles();
   const downloadFile = useDownloadFile();
 
@@ -17,13 +27,19 @@ export const Storage = () => {
     return response;
   };
 
+  const onRemoveFolder = async (path: string) => {
+    const response = await removeFolder.execute(path);
+    await openFolder.refetch(folder);
+    return response;
+  };
+
   const onUploadFiles = async (
     path: string,
     files: File[],
     overwrite: boolean
   ) => {
     const response = await uploadFiles.execute(path, files, overwrite);
-    await openFolder.refetch(path);
+    await openFolder.refetch(folder);
     return response;
   };
 
@@ -40,7 +56,14 @@ export const Storage = () => {
         create={{ loading: createFolder.loading, execute: onCreateFolder }}
         upload={{ loading: uploadFiles.loading, execute: onUploadFiles }}
       />
-      <Workspace openFolder={openFolder} downloadFile={downloadFile} />
+      <Workspace
+        openFolder={openFolder}
+        removeFolder={{
+          loading: removeFolder.loading,
+          execute: onRemoveFolder,
+        }}
+        downloadFile={downloadFile}
+      />
     </Box>
   );
 };

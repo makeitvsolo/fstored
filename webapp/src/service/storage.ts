@@ -56,6 +56,37 @@ export const useCreateFolder = () => {
   };
 };
 
+export const useRemoveFolder = () => {
+  const { loading, execute } = useMutation(foldersApi.remove);
+
+  const proxy = async (path: string): Promise<Message> => {
+    try {
+      await execute(path);
+      return {
+        ok: "folder created",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading,
+    execute: proxy,
+  };
+}
+
 export const useUploadFiles = () => {
   const { loading, execute } = useMutation(filesApi.upload);
 
