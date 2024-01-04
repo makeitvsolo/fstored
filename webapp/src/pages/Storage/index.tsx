@@ -4,6 +4,7 @@ import {
   useCreateFolder,
   useDownloadFile,
   useOpenFolder,
+  useRemoveFile,
   useRemoveFolder,
   useUploadFiles,
 } from "@service";
@@ -20,6 +21,7 @@ export const Storage = () => {
   const removeFolder = useRemoveFolder();
   const uploadFiles = useUploadFiles();
   const downloadFile = useDownloadFile();
+  const removeFile = useRemoveFile();
 
   const onCreateFolder = async (path: string, name: string) => {
     const response = await createFolder.execute(path, name);
@@ -39,6 +41,12 @@ export const Storage = () => {
     overwrite: boolean
   ) => {
     const response = await uploadFiles.execute(path, files, overwrite);
+    await openFolder.refetch(folder);
+    return response;
+  };
+
+  const onRemoveFile = async (path: string) => {
+    const response = await removeFile.execute(path);
     await openFolder.refetch(folder);
     return response;
   };
@@ -63,6 +71,7 @@ export const Storage = () => {
           execute: onRemoveFolder,
         }}
         downloadFile={downloadFile}
+        removeFile={{ loading: removeFile.loading, execute: onRemoveFile }}
       />
     </Box>
   );

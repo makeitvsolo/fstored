@@ -143,3 +143,34 @@ export const useDownloadFile = () => {
     fetch: download,
   };
 };
+
+export const useRemoveFile = () => {
+  const { loading, execute } = useMutation(filesApi.remove);
+
+  const proxy = async (path: string): Promise<Message> => {
+    try {
+      await execute(path);
+      return {
+        ok: "folder created",
+        error: null,
+      } as Message;
+    } catch (err) {
+      if ((err as Err).details) {
+        return {
+          ok: null,
+          error: (err as Err).details,
+        } as Message;
+      }
+
+      return {
+        ok: null,
+        error: "unexpected error",
+      } as Message;
+    }
+  };
+
+  return {
+    loading,
+    execute: proxy,
+  };
+}

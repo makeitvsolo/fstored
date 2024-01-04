@@ -32,6 +32,7 @@ interface FileProps {
   modificationTime: Date;
 
   download: (path: string) => Promise<void>;
+  remove: (path: string) => Promise<Message>;
 }
 
 interface FolderProps {
@@ -55,9 +56,19 @@ export interface WorkspaceProps {
   downloadFile: {
     fetch: (path: string) => Promise<void>;
   };
+  removeFile: {
+    loading: boolean;
+    execute: (path: string) => Promise<Message>;
+  };
 }
 
-const File = ({ path, size, modificationTime, download }: FileProps) => {
+const File = ({
+  path,
+  size,
+  modificationTime,
+  download,
+  remove,
+}: FileProps) => {
   const toName = (path: string) => {
     return path.split("/").reduce((_, second) => second);
   };
@@ -116,7 +127,12 @@ const File = ({ path, size, modificationTime, download }: FileProps) => {
         </MenuItem>
         <MenuDivider />
         <MenuItem icon={<EditIcon />}>Rename</MenuItem>
-        <MenuItem icon={<DeleteIcon />}>Remove</MenuItem>
+        <MenuItem
+          onClick={async () => await remove(path)}
+          icon={<DeleteIcon />}
+        >
+          Remove
+        </MenuItem>
       </MenuList>
     </Menu>
   );
@@ -172,6 +188,7 @@ export const Workspace = ({
   openFolder,
   removeFolder,
   downloadFile,
+  removeFile,
 }: WorkspaceProps) => {
   const folder = useFoldersStore((state) => state.folder);
 
@@ -199,6 +216,7 @@ export const Workspace = ({
                 size={child.size!}
                 modificationTime={child.modificationTime!}
                 download={downloadFile.fetch}
+                remove={removeFile.execute}
               />
             ) : (
               <Folder
