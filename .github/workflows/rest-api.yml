@@ -47,7 +47,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Execute Gradle build task
-        run: ./gradlew -x test -x check build
+        run: ./gradlew -x test -x check -x distTar -x distZip build
 
       - name: Execute Gradle test task
-        run: ./gradlew -x check test
+        run: ./gradlew -x check -x distTar -x distZip test
