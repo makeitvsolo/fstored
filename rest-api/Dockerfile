@@ -13,7 +13,7 @@ RUN gradle shadowJar -x test -x check
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /rest_api
 
-COPY --from=build /rest_api/boot/build/libs/*.jar ./fstored-api.jar
+COPY --from=build /rest_api/boot/build/libs/*-all.jar ./fstored-api.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "./fstored-api.jar"]

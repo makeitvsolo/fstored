@@ -1,4 +1,4 @@
-FROM oven/bun:1 as install
+FROM oven/bun:1 as build
 
 ARG VITE_API_URL
 
@@ -14,5 +14,10 @@ RUN bun install
 
 RUN bunx --bun vite build
 
+
+FROM nginx:latest
+
 EXPOSE 3000
-ENTRYPOINT ["bunx", "--bun", "vite", "preview"]
+
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /webapp/dist /usr/share/nginx/html
