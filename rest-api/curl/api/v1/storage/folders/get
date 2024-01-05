@@ -1,0 +1,27 @@
+# fetch root folder content
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request GET \
+     'http://localhost:8080/api/v1/storage/folders'
+
+# fetch folder content
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request GET \
+     'http://localhost:8080/api/v1/storage/folders/path/'
+
+# recursive search in root folder
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request GET \
+     'http://localhost:8080/api/v1/storage/folders?search=name'
+
+# recursive search in folder
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request GET \
+     'http://localhost:8080/api/v1/storage/folders/path/?search=name'

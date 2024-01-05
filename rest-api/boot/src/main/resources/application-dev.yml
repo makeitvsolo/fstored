@@ -1,0 +1,38 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+web:
+  cors:
+    allowed-origins: "http://localhost:8080,http://localhost:5173,http://localhost:3000"
+    allowed-headers: "Access-Control-Allow-Origin,Access-Control-Allow-Origin,Accept,Accept-Language,Content-Type,Content-Length,Cookie"
+    allowed-methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
+
+encoding:
+  cost: 6
+  salt: supersecret_salt
+
+redis:
+  host: localhost
+  port: 6379
+  session:
+    ttl: 3600
+    max-per-user: 2
+
+postgres:
+  url: jdbc:postgresql://localhost:5432/cloud-storage
+  username: username
+  password: userpassword
+
+minio:
+  url: http://localhost:9000
+  username: username
+  password: userpassword
+  root-bucket: userbucket

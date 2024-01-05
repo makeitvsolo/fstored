@@ -1,0 +1,27 @@
+import static github.makeitvsolo.fstored.workspace.CheckstyleConfig.*
+
+plugins {
+    id 'java'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    group = 'github.makeitvsolo.fstored'
+    version = '0.1.0'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    useCheckstyle(project)
+
+    tasks.test {
+        useJUnitPlatform()
+    }
+}

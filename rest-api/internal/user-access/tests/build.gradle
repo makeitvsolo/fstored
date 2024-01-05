@@ -1,0 +1,13 @@
+dependencies {
+    implementation(project(':internal:core'))
+    implementation(project(':internal:user-access:domain'))
+    implementation(project(':internal:user-access:application'))
+    implementation(project(':internal:user-access:encoding-bcrypt'))
+    implementation(project(':internal:user-access:persistence-sql'))
+    implementation(project(':internal:user-access:session-redis'))
+
+    testImplementation testWorkspace.junit.api
+    testRuntimeOnly testWorkspace.junit.engine
+    testImplementation testWorkspace.testcontainers
+    testImplementation testWorkspace.testcontainers.junit
+}

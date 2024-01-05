@@ -1,0 +1,15 @@
+# upload/overwrite file in root folder (file name from multipart request)
+curl --verbose \
+     --header 'Content-Type: multipart/form-data' \
+     --cookie 'TOKENID=${token_id}' \
+     --request PUT \
+     --form 'file=@/path/to/yourfile.ext' \
+     'http://localhost:8080/api/v1/storage/files'
+
+# upload/overwrite file (file name from multipart request)
+curl --verbose \
+     --header 'Content-Type: multipart/form-data' \
+     --cookie 'TOKENID=${token_id}' \
+     --request PUT \
+     --form 'file=@/path/to/yourfile.ext' \
+     'http://localhost:8080/api/v1/storage/files/path/to/'

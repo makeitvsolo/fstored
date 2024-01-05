@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':internal:core')
+    implementation project(':internal:user-access:domain')
+
+    testImplementation testWorkspace.junit.api
+    testImplementation testWorkspace.mockito.core
+    testRuntimeOnly testWorkspace.junit.engine
+}

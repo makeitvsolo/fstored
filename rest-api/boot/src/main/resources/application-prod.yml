@@ -1,0 +1,38 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+
+web:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS}
+    allowed-headers: "Access-Control-Allow-Origin,Access-Control-Allow-Origin,Accept,Accept-Language,Content-Type,Content-Length,Cookie"
+    allowed-methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
+
+encoding:
+  cost: ${ENCODING_COST}
+  salt: ${ENCODING_SALT}
+
+redis:
+  host: redis
+  port: 6379
+  session:
+    ttl: ${REDIS_SESSION_TTL}
+    max-per-user: ${REDIS_SESSION_MAX}
+
+postgres:
+  url: jdbc:postgresql://postgres:5432/cloud-storage
+  username: ${POSTGRES_USERNAME}
+  password: ${POSTGRES_PASSWORD}
+
+minio:
+  url: http://minio:9000
+  username: ${MINIO_USERNAME}
+  password: ${MINIO_PASSWORD}
+  root-bucket: ${MINIO_ROOT_BUCKET}

@@ -1,0 +1,31 @@
+plugins {
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'github.makeitvsolo.fstored.boot'
+
+application {
+    mainClassName = 'github.makeitvsolo.fstored.boot.FstoredApplication'
+}
+
+shadowJar {
+    mergeServiceFiles('META-INF/spring.*')
+}
+
+dependencies {
+    implementation project(':internal:core')
+
+    implementation project(':internal:storage:domain')
+    implementation project(':internal:storage:application')
+    implementation project(':internal:storage:storage-minio')
+
+    implementation(project(':internal:user-access:domain'))
+    implementation(project(':internal:user-access:application'))
+    implementation(project(':internal:user-access:encoding-bcrypt'))
+    implementation(project(':internal:user-access:persistence-sql'))
+    implementation(project(':internal:user-access:session-redis'))
+
+    implementation boot.spring.web
+    implementation boot.spring.validation
+}

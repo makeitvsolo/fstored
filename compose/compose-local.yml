@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  rest:
+    build:
+      context: ../rest-api
+    environment:
+      ALLOWED_ORIGINS: "http://localhost/,"
+      ENCODING_COST: 6
+      ENCODING_SALT: supersecret_salt
+      REDIS_SESSION_TTL: 3600
+      REDIS_SESSION_MAX_PER_USER: 2
+      POSTGRES_USERNAME: username
+      POSTGRES_PASSWORD: userpassword
+      MINIO_USERNAME: username
+      MINIO_PASSWORD: userpassword
+      MINIO_ROOT_BUCKET: userbucket 
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+  webapp:
+    build: 
+      context: ../webapp
+      args:
+        VITE_API_URL: /api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rest
+
+  postgres:
+    image: postgres:15-alpine
+    volumes:
+      - ~/data/postgres:/var/lib/postgresql/data/
+      - ../rest-api/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: cloud-storage
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: userpassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "$${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+  
+  redis:
+    image: redis:6-alpine
+    volumes:
+      - ~/data/redis:/var/lib/redis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+    command: redis-server
+
+  minio:
+    image: minio/minio:latest
+    volumes:
+      - ~/data/minio:/data
+    environment:
+      MINIO_ROOT_USER: username
+      MINIO_ROOT_PASSWORD: userpassword
+    healthcheck:
+      test: ["CMD-SHELL", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+    command: server /data
+  
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ../nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - rest
+      - webapp

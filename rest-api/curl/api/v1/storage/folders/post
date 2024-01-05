@@ -1,0 +1,13 @@
+# make empty folder
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request POST \
+     'http://localhost:8080/api/v1/storage/folders/path/'
+
+# move/rename folder
+curl --verbose \
+     --header 'Content-Type: application/json' \
+     --cookie 'TOKENID=${token_id}' \
+     --request POST \
+     'http://localhost:8080/api/v1/storage/folders/renamed/?mvfrom=/path/'

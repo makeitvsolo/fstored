@@ -1,0 +1,62 @@
+rootProject.name = 'fstored-api'
+
+include 'boot'
+
+include 'internal:core'
+
+include 'internal:storage'
+include 'internal:storage:domain'
+include 'internal:storage:application'
+include 'internal:storage:storage-minio'
+include 'internal:storage:tests'
+
+include 'internal:user-access'
+include 'internal:user-access:domain'
+include 'internal:user-access:application'
+include 'internal:user-access:encoding-bcrypt'
+include 'internal:user-access:persistence-sql'
+include 'internal:user-access:session-redis'
+include 'internal:user-access:tests'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        boot {
+            def spring = version('spirng', '3.1.5')
+
+            library('spring-web', 'org.springframework.boot', 'spring-boot-starter-web').versionRef(spring)
+            library('spring-validation', 'org.springframework.boot', 'spring-boot-starter-validation').versionRef(spring)
+        }
+
+        workspace {
+            def minio = version('minio', '8.5.7')
+            def bcrypt = version('bcrypt', '0.10.2')
+            def postgres = version('postgres', '42.6.0')
+            def hikari = version('hikari', '5.1.0')
+            def jedis = version('jedis', '5.0.2')
+
+            library('minio', 'io.minio', 'minio').versionRef(minio)
+
+            library('bcrypt', 'at.favre.lib', 'bcrypt').versionRef(bcrypt)
+
+            library('postgres', 'org.postgresql', 'postgresql').versionRef(postgres)
+            library('postgres-hikaricp', 'com.zaxxer', 'HikariCP').versionRef(hikari)
+
+            library('jedis', 'redis.clients', 'jedis').versionRef(jedis)
+        }
+
+        testWorkspace {
+            def junit5 = version('junit5', '5.10.1')
+            def mockito = version('mockito', '5.7.0')
+            def testcontainers = version('testcontainers', '1.19.2')
+
+            library('junit-api', 'org.junit.jupiter', 'junit-jupiter-api').versionRef(junit5)
+            library('junit-engine', 'org.junit.jupiter', 'junit-jupiter-engine').versionRef(junit5)
+            library('junit-params', 'org.junit.jupiter', 'junit-jupiter-params').versionRef(junit5)
+
+            library('mockito-core', 'org.mockito', 'mockito-core').versionRef(mockito)
+
+            library('testcontainers', 'org.testcontainers', 'testcontainers').versionRef(testcontainers)
+            library('testcontainers-junit', 'org.testcontainers', 'junit-jupiter').versionRef(testcontainers)
+        }
+    }
+}
