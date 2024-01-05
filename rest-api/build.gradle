@@ -2,12 +2,10 @@ import static github.makeitvsolo.fstored.workspace.CheckstyleConfig.*
 
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
 
     group = 'github.makeitvsolo.fstored'
     version = '0.1.0-dev'

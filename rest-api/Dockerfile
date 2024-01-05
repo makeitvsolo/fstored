@@ -1,5 +1,5 @@
 FROM gradle:8.5.0-jdk17 as build
-WORKDIR /rest-api
+WORKDIR /rest_api
 
 COPY --chown=gradle:gradle . ./
 
@@ -7,13 +7,34 @@ COPY buildSrc ./buildSrc
 COPY boot ./boot
 COPY internal ./internal
 
-RUN gradle shadowJar --no-daemon -x test -x check
+RUN gradle shadowJar -x test -x check
 
 
 FROM eclipse-temurin:17-jre-jammy
-WORKDIR /
 
-COPY --from=build /rest-api/boot/build/libs/*.jar fstored-api.jar
+ARG ENCODING_COST
+ARG ENCODING_SALT
+ARG REDIS_SESSION_TTL
+ARG REDIS_SESSION_MAX_PER_USER
+ARG POSTGRES_USERNAME
+ARG POSTGRES_PASSWORD
+ARG MINIO_USERNAME
+ARG MINIO_PASSWORD
+ARG MINIO_ROOT_BUCKET
+
+ENV ENCODING_COST=$ENCODING_COST  
+ENV ENCODING_SALT=$ENCODING_SALT
+ENV REDIS_SESSION_TTL=$REDIS_SESSION_TTL
+ENV REDIS_SESSION_MAX_PER_USER=$REDIS_SESSION_MAX_PER_USER
+ENV POSTGRES_USERNAME=$POSTGRES_USERNAME
+ENV POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+ENV MINIO_USERNAME=$MINIO_USERNAME
+ENV MINIO_PASSWORD=$MINIO_PASSWORD
+ENV MINIO_ROOT_BUCKET=$MINIO_ROOT_BUCKET
+
+WORKDIR /rest_api
+
+COPY --from=build /rest_api/boot/build/libs/*.jar ./fstored-api.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "fstored-api.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "./fstored-api.jar"]
